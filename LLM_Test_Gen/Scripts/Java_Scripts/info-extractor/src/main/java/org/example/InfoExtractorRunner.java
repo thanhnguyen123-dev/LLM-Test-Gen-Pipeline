@@ -24,11 +24,17 @@ import com.github.javaparser.ast.stmt.SwitchStmt;
 import com.github.javaparser.ast.stmt.ForStmt;
 import com.github.javaparser.ast.stmt.WhileStmt;
 import com.github.javaparser.ast.stmt.DoStmt;
+
 import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.ast.expr.StringLiteralExpr;
+import com.github.javaparser.ast.expr.CharLiteralExpr;
+import com.github.javaparser.ast.expr.IntegerLiteralExpr;
+import com.github.javaparser.ast.expr.DoubleLiteralExpr;
+import com.github.javaparser.ast.expr.BooleanLiteralExpr;
+
 
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.*;
-
 
 import java.io.File;
 import java.io.FileWriter;
@@ -55,7 +61,8 @@ public class InfoExtractorRunner {
             "Class Fields",
             "Loop Count",
             "Branch Count",
-            "External Dependencies"
+            "External Dependencies",
+            "Literal Constants"
     };
 
     private static final String CSV_HEADER = InfoExtractorRunner.getCsvHeader();
@@ -274,6 +281,28 @@ public class InfoExtractorRunner {
                             .distinct()
                             .collect(Collectors.joining(", "));
 
+                    // Get literal constants
+                    List<String> literalList = new ArrayList<>();
+                    methodDeclaration.findAll(StringLiteralExpr.class).forEach(literal -> {
+                        literalList.add("\"" + literal.getValue() + "\"");
+                    });
+                    methodDeclaration.findAll(CharLiteralExpr.class).forEach(charLiteral -> {
+                        literalList.add("'" + charLiteral.getValue() + "'");
+                    });
+                    methodDeclaration.findAll(IntegerLiteralExpr.class).forEach(integer -> {
+                        literalList.add(integer.getValue());
+                    });
+                    methodDeclaration.findAll(DoubleLiteralExpr.class).forEach(doubleLiteral -> {
+                        literalList.add(doubleLiteral.getValue());
+                    });
+                    methodDeclaration.findAll(BooleanLiteralExpr.class).forEach(booleanLiteral -> {
+                        literalList.add(String.valueOf(booleanLiteral.getValue()));
+                    });
+
+                    String literalsRaw = literalList.stream()
+                            .distinct()
+                            .collect(Collectors.joining(", "));
+
                     // Construct a CSV line
                     String csvLine = String.join(
                             CSV_DELIMITER,
@@ -288,7 +317,8 @@ public class InfoExtractorRunner {
                             quoteField(classFields),
                             quoteField(String.valueOf(loopCount)),
                             quoteField(String.valueOf(branchCount)),
-                            quoteField(externalCallsRaw)
+                            quoteField(externalCallsRaw),
+                            quoteField(literalsRaw)
 
                     );
                     writer.println(csvLine);

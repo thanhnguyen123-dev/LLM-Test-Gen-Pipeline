@@ -91,5 +91,10 @@
       <artifactId>javaparser-symbol-solver-core</artifactId>
       <version>3.26.4</version>
     </dependency>
+    <dependency>
+      <groupId>org.soot-oss</groupId>
+      <artifactId>soot</artifactId>
+      <version>4.6.0</version>
+    </dependency>
   </dependencies>
 </project>
