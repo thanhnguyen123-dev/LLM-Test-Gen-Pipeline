@@ -2,13 +2,12 @@ package org.example;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParserConfiguration;
-import javassist.compiler.ast.MethodDecl;
+import com.github.javaparser.ast.body.CallableDeclaration;
+import com.github.javaparser.ast.body.ConstructorDeclaration;
+import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
 import sootup.core.Project;
 import sootup.core.inputlocation.AnalysisInputLocation;
-import sootup.core.model.Method;
-import sootup.core.model.SootField;
-import sootup.core.model.SootMethod;
-import sootup.core.model.SootClass;
+import sootup.core.model.*;
 import sootup.core.types.ClassType;
 import sootup.core.views.View;
 import sootup.java.bytecode.inputlocation.JavaClassPathAnalysisInputLocation;
@@ -18,16 +17,14 @@ import sootup.java.core.JavaSootClassSource;
 import sootup.java.core.language.JavaLanguage;
 import sootup.core.types.Type;
 
-import com.github.javaparser.JavaParser;
-import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
-import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.SwitchStmt;
 import com.github.javaparser.ast.stmt.ForStmt;
 import com.github.javaparser.ast.stmt.WhileStmt;
 import com.github.javaparser.ast.stmt.DoStmt;
+import com.github.javaparser.ast.expr.MethodCallExpr;
 
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.*;
@@ -38,10 +35,7 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -53,6 +47,7 @@ public class InfoExtractorRunner {
             "FQN",
             "Signature",
             "Jimple Code Representation",
+            "Is Constructor",
             "Method Modifiers",
             "Annotations",
             "Java Doc",
@@ -60,10 +55,9 @@ public class InfoExtractorRunner {
             "Class Fields",
             "Loop Count",
             "Branch Count",
-//            "Parameter Constraints",
-//            "External Dependencies",
-//            "Literal Constants"
+            "External Dependencies"
     };
+
     private static final String CSV_HEADER = InfoExtractorRunner.getCsvHeader();
     private static final JavaParser parser = createJavaParser();
 
@@ -115,7 +109,7 @@ public class InfoExtractorRunner {
                 // Iterate over each method in the class
                 for (SootMethod method : sootClass.getMethods()) {
                     // Only proceed if the method is concrete
-                    if (!method.isConcrete() || method.getName().startsWith("access$")) {
+                    if (!method.isConcrete() || method.getName().equals("<clinit>") || method.getName().startsWith("access$")) {
                         continue;
                     }
 
@@ -131,29 +125,10 @@ public class InfoExtractorRunner {
                     StringBuilder fqnStringBuilder = new StringBuilder();
                     StringBuilder signatureStringBuilder = new StringBuilder();
 
-                    // Get the FQN
-                    fqnStringBuilder
-                            .append(fullClassName)
-                            .append(".")
-                            .append(methodName)
-                            .append("(")
-                            .append(paramListString)
-                            .append(")");
-
-                    // Get the signature
-                    signatureStringBuilder
-                            .append(returnType)
-                            .append(" ")
-                            .append(methodName)
-                            .append("(")
-                            .append(paramListString)
-                            .append(")");
-
-                    // Get the Jimple code
-                    String jimpleCode = method.getBody().toString();
 
                     // Set up configuration for JavaParser to parse the source file
                     String classPath = fullClassName.replace('.', File.separatorChar);
+                    String simpleClassName = sootClass.getName().substring(sootClass.getName().lastIndexOf('.') + 1);
                     Path srcPath = Paths.get(
                             LANG_1_BUGGY_SRC_RELATIVE_PATH,
                             classPath + ".java"
@@ -164,18 +139,54 @@ public class InfoExtractorRunner {
                             .orElseThrow(() -> new RuntimeException("Unable to parse: " + srcPath));
 
                     ClassOrInterfaceDeclaration classOrInterfaceDeclaration = compilationUnit
-                            .getClassByName(sootClass.getName().substring(sootClass.getName().lastIndexOf('.') + 1))
+                            .getClassByName(simpleClassName)
                             .orElseThrow(() -> new RuntimeException("Class not found: " + sootClass.getName()));
 
                     Integer paramCount = paramTypes.size();
 
-                    MethodDeclaration methodDeclaration = classOrInterfaceDeclaration.getMethodsByName(methodName)
-                            .stream()
-                            .filter(m ->
-                                    m.getParameters().size() == method.getParameterCount()
-                            )
-                            .findFirst()
-                            .orElseThrow(() -> new RuntimeException("Method not found: " + methodName));
+                    CallableDeclaration<?> methodDeclaration;
+
+                    if (methodName.equals("<init>")) {
+                        List<ConstructorDeclaration> constructorDeclarationList = classOrInterfaceDeclaration.getConstructors()
+                                .stream()
+                                .filter(c -> c.getParameters().size() == paramCount)
+                                .collect(Collectors.toList());
+                        if (constructorDeclarationList.isEmpty()) continue;
+                        methodDeclaration = constructorDeclarationList.get(0);
+                    }
+
+                    else {
+                        methodDeclaration = classOrInterfaceDeclaration.getMethodsByName(methodName)
+                                .stream()
+                                .filter(m ->
+                                        m.getParameters().size() == method.getParameterCount()
+                                )
+                                .findFirst()
+                                .orElseThrow(() -> new RuntimeException("Method not found: " + methodName));
+                    }
+
+                    // Get the FQN
+                    String methodNameToUse = methodName.equals("<init>") ? simpleClassName : methodName;
+
+                    fqnStringBuilder
+                            .append(fullClassName)
+                            .append(".")
+                            .append(methodNameToUse)
+                            .append("(")
+                            .append(paramListString)
+                            .append(")");
+
+                    // Get the signature
+                    signatureStringBuilder
+                            .append(returnType)
+                            .append(" ")
+                            .append(methodNameToUse)
+                            .append("(")
+                            .append(paramListString)
+                            .append(")");
+
+                    // Get the Jimple code
+                    String jimpleCode = method.getBody().toString();
 
                     // Get the modifiers from the Soot Method
                     String modifiers = method.getModifiers().stream()
@@ -185,7 +196,7 @@ public class InfoExtractorRunner {
                     // Get annotations
                     String annotations = methodDeclaration.getAnnotations().stream()
                             .map(a -> a.getNameAsString())
-                            .collect(Collectors.joining(" "));
+                            .collect(Collectors.joining(", "));
 
                     // Get JavaDoc
                     String rawJavaDoc = methodDeclaration.getJavadoc()
@@ -214,15 +225,15 @@ public class InfoExtractorRunner {
                     }
                     List<String> interfaces = sootClass.getInterfaces().stream()
                             .map(ct -> ct.getFullyQualifiedName())
-                            .filter(name -> !name.equals("java.io.Serializable"))
+//                            .filter(name -> !name.equals("java.io.Serializable"))
                             .collect(Collectors.toList());
                     String classContext;
                     if (!superName.isEmpty() && !interfaces.isEmpty()) {
-                        classContext = superName + " implements " + String.join(" ", interfaces);
+                        classContext = superName + " implements " + String.join(", ", interfaces);
                     } else if (!superName.isEmpty()) {
                         classContext = superName;
                     } else if (!interfaces.isEmpty()) {
-                        classContext = "implements " + String.join(" ", interfaces);
+                        classContext = "implements " + String.join(", ", interfaces);
                     } else {
                         classContext = "";
                     }
@@ -249,19 +260,36 @@ public class InfoExtractorRunner {
                     int doCount = methodDeclaration.findAll(DoStmt.class).size();
                     int loopCount = forCount + whileCount + doCount;
 
+                    // Get external dependencies
+                    List<String> externalCalls = new ArrayList<>();
+                    methodDeclaration.findAll(MethodCallExpr.class).forEach(call -> {
+                        try {
+                            ResolvedMethodDeclaration resolvedMethodDeclaration = call.resolve();
+                            externalCalls.add(resolvedMethodDeclaration.getQualifiedSignature());
+                        } catch (Exception e) {
+                            // Ignore unresolved method calls
+                        }
+                    });
+                    String externalCallsRaw = externalCalls.stream()
+                            .distinct()
+                            .collect(Collectors.joining(", "));
+
                     // Construct a CSV line
                     String csvLine = String.join(
                             CSV_DELIMITER,
                             quoteField(fqnStringBuilder.toString()),
                             quoteField(signatureStringBuilder.toString()),
                             quoteField(jimpleCode),
+                            quoteField(String.valueOf(methodName.equals("<init>"))),
                             quoteField(modifiers),
                             quoteField(annotations),
                             quoteField(rawJavaDoc),
                             quoteField(classContext),
                             quoteField(classFields),
                             quoteField(String.valueOf(loopCount)),
-                            quoteField(String.valueOf(branchCount))
+                            quoteField(String.valueOf(branchCount)),
+                            quoteField(externalCallsRaw)
+
                     );
                     writer.println(csvLine);
 
