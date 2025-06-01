@@ -6,8 +6,10 @@ import javassist.compiler.ast.MethodDecl;
 import sootup.core.Project;
 import sootup.core.inputlocation.AnalysisInputLocation;
 import sootup.core.model.Method;
+import sootup.core.model.SootField;
 import sootup.core.model.SootMethod;
 import sootup.core.model.SootClass;
+import sootup.core.types.ClassType;
 import sootup.core.views.View;
 import sootup.java.bytecode.inputlocation.JavaClassPathAnalysisInputLocation;
 import sootup.java.core.JavaProject;
@@ -21,7 +23,12 @@ import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.Modifier;
+import com.github.javaparser.ast.stmt.IfStmt;
+import com.github.javaparser.ast.stmt.SwitchStmt;
+import com.github.javaparser.ast.stmt.ForStmt;
+import com.github.javaparser.ast.stmt.WhileStmt;
+import com.github.javaparser.ast.stmt.DoStmt;
+
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.*;
 
@@ -33,6 +40,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -41,17 +49,17 @@ public class InfoExtractorRunner {
     private static final String TEST_DATA_RELATIVE_PATH = "../../Data/Test_Data.csv";
     private static final String LANG_1_BUGGY_SRC_RELATIVE_PATH = "../../../lang_1_buggy/src/main/java";
     private static final String CSV_DELIMITER = ",";
-//    private static final String CSV_HEADER = "\"FQN\",\"Signature\",\"Jimple Code Representation\"";
     private static final String[] CSV_COLUMNS = {
             "FQN",
             "Signature",
             "Jimple Code Representation",
             "Method Modifiers",
             "Annotations",
-//            "Java Doc",
-//            "Class Context",
-//            "Class-level Fields",
-//            "Control-Flow Graph",
+            "Java Doc",
+            "Class Context",
+            "Class Fields",
+            "Loop Count",
+            "Branch Count",
 //            "Parameter Constraints",
 //            "External Dependencies",
 //            "Literal Constants"
@@ -93,7 +101,6 @@ public class InfoExtractorRunner {
 
 
         // Iterate over each class
-
         try (PrintWriter writer = new PrintWriter(new FileWriter(outputCsvAbsPath.toString())))  {
             writer.println(CSV_HEADER);
 
@@ -108,11 +115,11 @@ public class InfoExtractorRunner {
                 // Iterate over each method in the class
                 for (SootMethod method : sootClass.getMethods()) {
                     // Only proceed if the method is concrete
-                    if (!method.isConcrete() || method.getName().equals("<init>") || method.getName().equals("<clinit>") || method.getName().startsWith("access$")) {
+                    if (!method.isConcrete() || method.getName().startsWith("access$")) {
                         continue;
                     }
 
-                    // Extract method name, parameter types, and return type
+                    // Get method name, parameter types, and return type
                     String methodName = method.getName();
                     List<Type> paramTypes = method.getParameterTypes();
                     Type returnType = method.getReturnType();
@@ -124,7 +131,7 @@ public class InfoExtractorRunner {
                     StringBuilder fqnStringBuilder = new StringBuilder();
                     StringBuilder signatureStringBuilder = new StringBuilder();
 
-                    // Construct the FQN
+                    // Get the FQN
                     fqnStringBuilder
                             .append(fullClassName)
                             .append(".")
@@ -133,7 +140,7 @@ public class InfoExtractorRunner {
                             .append(paramListString)
                             .append(")");
 
-                    // Construct the signature
+                    // Get the signature
                     signatureStringBuilder
                             .append(returnType)
                             .append(" ")
@@ -142,14 +149,10 @@ public class InfoExtractorRunner {
                             .append(paramListString)
                             .append(")");
 
-                    // Retrieve the Jimple code
+                    // Get the Jimple code
                     String jimpleCode = method.getBody().toString();
 
-                    String quotedFqn = quoteField(fqnStringBuilder.toString());
-                    String quotedSignature = quoteField(signatureStringBuilder.toString());
-                    String quotedJimpleCode = quoteField(jimpleCode);
-
-                    // Retrieve the Method Modifiers
+                    // Set up configuration for JavaParser to parse the source file
                     String classPath = fullClassName.replace('.', File.separatorChar);
                     Path srcPath = Paths.get(
                             LANG_1_BUGGY_SRC_RELATIVE_PATH,
@@ -184,12 +187,7 @@ public class InfoExtractorRunner {
                             .map(a -> a.getNameAsString())
                             .collect(Collectors.joining(" "));
 
-
-
-                    String quotedModifiers = quoteField(modifiers);
-                    String quotedAnnotations = quoteField(annotations);
-
-
+                    // Get JavaDoc
                     String rawJavaDoc = methodDeclaration.getJavadoc()
                             .map(javadoc -> {
                                 StringBuilder sb = new StringBuilder();
@@ -204,21 +202,70 @@ public class InfoExtractorRunner {
                                 return sb.toString();
                             }).orElse("");
 
-                    String quotedJavaDoc = quoteField(rawJavaDoc);
+                    // Get class context
+                    String superName = "";
+                    Optional<? extends ClassType> maybeSuper = sootClass.getSuperclass();
+                    if (maybeSuper.isPresent()) {
+                        ClassType classType = maybeSuper.get();
+                        String fqn = classType.getFullyQualifiedName();
+                        if (!fqn.equals("java.lang.Object")) {
+                            superName = fqn;
+                        }
+                    }
+                    List<String> interfaces = sootClass.getInterfaces().stream()
+                            .map(ct -> ct.getFullyQualifiedName())
+                            .filter(name -> !name.equals("java.io.Serializable"))
+                            .collect(Collectors.toList());
+                    String classContext;
+                    if (!superName.isEmpty() && !interfaces.isEmpty()) {
+                        classContext = superName + " implements " + String.join(" ", interfaces);
+                    } else if (!superName.isEmpty()) {
+                        classContext = superName;
+                    } else if (!interfaces.isEmpty()) {
+                        classContext = "implements " + String.join(" ", interfaces);
+                    } else {
+                        classContext = "";
+                    }
 
+                    // Get class fields
+                    String classFields = sootClass.getFields().stream()
+                            .map(field -> {
+                                String fieldName = field.getName();
+                                String fieldType = field.getType().toString();
+                                String fieldModifiers = field.getModifiers().stream()
+                                        .map(Enum::name)
+                                        .collect(Collectors.joining(" "));
+                                return fieldModifiers + " " + fieldType + " " + fieldName;
+                            })
+                            .collect(Collectors.joining("; "));
 
+                    // Get branchCount
+                    int ifCount = methodDeclaration.findAll(IfStmt.class).size();
+                    int switchCount = methodDeclaration.findAll(SwitchStmt.class).size();
+                    int branchCount = ifCount + switchCount;
+
+                    int forCount = methodDeclaration.findAll(ForStmt.class).size();
+                    int whileCount = methodDeclaration.findAll(WhileStmt.class).size();
+                    int doCount = methodDeclaration.findAll(DoStmt.class).size();
+                    int loopCount = forCount + whileCount + doCount;
+
+                    // Construct a CSV line
                     String csvLine = String.join(
                             CSV_DELIMITER,
-                            quotedFqn,
-                            quotedSignature,
-                            quotedJimpleCode,
-                            quotedModifiers,
-                            quotedAnnotations,
-                            quotedJavaDoc
+                            quoteField(fqnStringBuilder.toString()),
+                            quoteField(signatureStringBuilder.toString()),
+                            quoteField(jimpleCode),
+                            quoteField(modifiers),
+                            quoteField(annotations),
+                            quoteField(rawJavaDoc),
+                            quoteField(classContext),
+                            quoteField(classFields),
+                            quoteField(String.valueOf(loopCount)),
+                            quoteField(String.valueOf(branchCount))
                     );
                     writer.println(csvLine);
 
-                    // Print the information
+                    // Print the information in terminal (for fast debugging)
                     System.out.println("-----------------------------------------------------------------");
                     System.out.println("CODE INFORMATION:\n");
                     System.out.println("- FQN: " + fqnStringBuilder);
@@ -227,6 +274,8 @@ public class InfoExtractorRunner {
                     System.out.println("- Method Modifiers: " + modifiers);
                     System.out.println("- Annotations: " + annotations);
                     System.out.println("- JavaDoc: " + rawJavaDoc);
+                    System.out.println("- Class Context: " + classContext);
+                    System.out.println("- Class Fields: " + classFields);
                     System.out.println("-----------------------------------------------------------------");
                 }
             }
