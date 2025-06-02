@@ -4,8 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(JUnit4.class)
 public class CharRange_char_getStart_Test {
@@ -14,23 +13,23 @@ public class CharRange_char_getStart_Test {
 
     @Before
     public void setUp() {
-        charRange = new CharRange('a', 'z');
+        charRange = CharRange.is('a');
     }
 
     @Test
-    public void testGetStartTypical() {
+    public void testGetStartTypicalCase() {
         assertEquals('a', charRange.getStart());
     }
 
     @Test
-    public void testGetStartSingleCharRange() {
-        CharRange singleCharRange = new CharRange('x');
-        assertEquals('x', singleCharRange.getStart());
+    public void testGetStartEdgeCase() {
+        CharRange edgeCaseRange = CharRange.is('\0');
+        assertEquals('\0', edgeCaseRange.getStart());
     }
 
     @Test
-    public void testGetStartEmptyRange() {
-        CharRange emptyRange = CharRange.is(' ');
-        assertEquals(' ', emptyRange.getStart());
+    public void testGetStartBoundaryCase() {
+        CharRange boundaryCaseRange = CharRange.is(Character.MAX_VALUE);
+        assertEquals(Character.MAX_VALUE, boundaryCaseRange.getStart());
     }
 }

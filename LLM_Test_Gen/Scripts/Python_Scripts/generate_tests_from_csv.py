@@ -22,8 +22,8 @@ TARGET_CLASS_PREFIXES = [
 ]
 
 # CSV Column Headers
-INPUT_HEADER = ["FQN", "Signature", "Jimple Code Representation", "Is Constructor", "Method Modifiers", "Annotations", "Java Doc", "Class Context", "Class Fields", "Loop Count", "Branch Count", "External Dependencies", "Literal Constants", "Constructor Visibility"]
-OUTPUT_HEADER = ["FQN", "Signature", "Jimple Code Representation", "Is Constructor", "Method Modifiers", "Annotations", "Java Doc", "Class Context", "Class Fields", "Loop Count", "Branch Count", "External Dependencies", "Literal Constants", "Constructor Visibility", "Generated Code"]
+INPUT_HEADER = ["FQN", "Signature", "Jimple Code Representation", "Is Constructor", "Method Modifiers", "Annotations", "Java Doc", "Class Context", "Class Fields", "Loop Count", "Branch Count", "External Dependencies", "Literal Constants", "Constructor Visibility", "Class Factory Methods"]
+OUTPUT_HEADER = ["FQN", "Signature", "Jimple Code Representation", "Is Constructor", "Method Modifiers", "Annotations", "Java Doc", "Class Context", "Class Fields", "Loop Count", "Branch Count", "External Dependencies", "Literal Constants", "Constructor Visibility", "Class Factory Methods", "Generated Code"]
 
 # Delay between API calls (in seconds) to avoid rate limits
 API_CALL_DELAY = 1
@@ -83,6 +83,7 @@ if __name__ == "__main__":
                 header_indices['external_dependencies'] = header.index(INPUT_HEADER[11])
                 header_indices['literal_constants'] = header.index(INPUT_HEADER[12])
                 header_indices['constructor_visibility'] = header.index(INPUT_HEADER[13])
+                header_indices['class_factory_methods'] = header.index(INPUT_HEADER[14])
             except ValueError as e:
                 print(f"FATAL ERROR: Missing expected column in input CSV: {e}. Expected: {INPUT_HEADER}")
                 exit(1)
@@ -111,7 +112,8 @@ if __name__ == "__main__":
                         'branch_count': row[header_indices['branch_count']],
                         'external_dependencies': row[header_indices['external_dependencies']],
                         'literal_constants': row[header_indices['literal_constants']],
-                        'constructor_visibility': row[header_indices['constructor_visibility']]
+                        'constructor_visibility': row[header_indices['constructor_visibility']],
+                        'class_factory_methods': row[header_indices['class_factory_methods']]
                     })
 
         print(f"Found {len(methods_to_process)} methods matching target classes.")
@@ -150,6 +152,7 @@ if __name__ == "__main__":
                 external_dependencies = method_data['external_dependencies']
                 literal_constants = method_data['literal_constants']
                 constructor_visibility = method_data['constructor_visibility']
+                class_factory_methods = method_data['class_factory_methods']
                 print(f"\nProcessing method {processed_count + 1}/{len(methods_to_process)}: {fqn}")
 
                 # call OpenAI service to generate test code
@@ -167,7 +170,8 @@ if __name__ == "__main__":
                     branch_count,
                     external_dependencies,
                     literal_constants,
-                    constructor_visibility
+                    constructor_visibility,
+                    class_factory_methods
                 )
 
                 # Check for errors in the generated code
@@ -178,7 +182,7 @@ if __name__ == "__main__":
                      print(f"  -> Test code generated successfully.")
 
                 # Write the results to the output CSV
-                writer.writerow([fqn, signature, jimple, is_constructor, method_modifiers, annotations, java_doc, class_context, class_fields, loop_count, branch_count, external_dependencies, literal_constants, constructor_visibility, generated_code])
+                writer.writerow([fqn, signature, jimple, is_constructor, method_modifiers, annotations, java_doc, class_context, class_fields, loop_count, branch_count, external_dependencies, literal_constants, constructor_visibility, class_factory_methods, generated_code])
                 processed_count += 1
 
                 # Add delay between API calls to avoid rate limits

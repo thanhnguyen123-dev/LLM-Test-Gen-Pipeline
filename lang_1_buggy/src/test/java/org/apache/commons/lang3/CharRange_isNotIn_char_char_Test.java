@@ -1,7 +1,7 @@
 package org.apache.commons.lang3;
 
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
@@ -14,54 +14,67 @@ public class CharRange_isNotIn_char_char_Test {
 
     @Before
     public void setUp() {
-        // No need to instantiate CharRange since the method is static
+        // Set up any common test data if needed
     }
 
     @Test
     public void testTypicalUseCase() {
-        CharRange range = CharRange.isNotIn('a', 'z');
-        assertNotNull(range);
-        assertTrue(range.isNegated());
-        assertEquals('a', range.getStart());
-        assertEquals('z', range.getEnd());
+        char start = 'a';
+        char end = 'z';
+        CharRange result = CharRange.isNotIn(start, end);
+
+        assertNotNull(result);
+        assertTrue(result.isNegated());
+        assertEquals(start, result.getStart());
+        assertEquals(end, result.getEnd());
     }
 
     @Test
-    public void testEdgeCaseEmptyRange() {
-        CharRange range = CharRange.isNotIn('a', 'a');
-        assertNotNull(range);
-        assertTrue(range.isNegated());
-        assertEquals('a', range.getStart());
-        assertEquals('a', range.getEnd());
+    public void testEdgeCaseSingleCharacter() {
+        char start = 'a';
+        char end = 'a';
+        CharRange result = CharRange.isNotIn(start, end);
+
+        assertNotNull(result);
+        assertTrue(result.isNegated());
+        assertEquals(start, result.getStart());
+        assertEquals(end, result.getEnd());
     }
 
     @Test
-    public void testReverseRange() {
-        CharRange range = CharRange.isNotIn('z', 'a');
-        assertNotNull(range);
-        assertTrue(range.isNegated());
-        assertEquals('z', range.getStart());
-        assertEquals('a', range.getEnd());
-    }
-
-    @Test
-    public void testBoundaryValues() {
-        CharRange range = CharRange.isNotIn(Character.MIN_VALUE, Character.MAX_VALUE);
-        assertNotNull(range);
-        assertTrue(range.isNegated());
-        assertEquals(Character.MIN_VALUE, range.getStart());
-        assertEquals(Character.MAX_VALUE, range.getEnd());
-    }
-
-    @Test
-    public void testErrorCaseWithInvalidCharacters() {
+    public void testErrorCaseNullCharRange() {
         try {
-            CharRange range = CharRange.isNotIn((char) -1, (char) -1);
-            assertNotNull(range); // Expect an exception to be thrown
-        } catch (IllegalArgumentException e) {
-            // Expected due to invalid character values
+            CharRange result = CharRange.isNotIn('\0', '\0');
+            assertNotNull(result);
+        } catch (Exception e) {
+            fail("Exception should not be thrown for null char range: " + e.getMessage());
         }
     }
 
-    // Add more test cases as needed for further corner cases revealed in Jimple or logic understanding
+    @Test
+    public void testBoundaryCaseMaxAndMinValue() {
+        char start = Character.MIN_VALUE;
+        char end = Character.MAX_VALUE;
+
+        CharRange result = CharRange.isNotIn(start, end);
+
+        assertNotNull(result);
+        assertTrue(result.isNegated());
+        assertEquals(start, result.getStart());
+        assertEquals(end, result.getEnd());
+    }
+
+    @Test
+    public void testTypicalInverseRange() {
+        char start = 'z';
+        char end = 'a';
+
+        CharRange result = CharRange.isNotIn(start, end);
+
+        assertNotNull(result);
+        assertTrue(result.isNegated());
+        // Test when start is greater than end
+        assertEquals(start, result.getStart());
+        assertEquals(end, result.getEnd());
+    }
 }

@@ -1,5 +1,6 @@
 package org.apache.commons.lang3;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -8,46 +9,68 @@ import static org.junit.Assert.*;
 @RunWith(JUnit4.class)
 public class CharRange_isIn_char_char_Test {
 
-    @Test
-    public void testTypicalRange() {
-        CharRange range = CharRange.isIn('a', 'z');
-        assertTrue(range.contains('a'));
-        assertTrue(range.contains('m'));
-        assertTrue(range.contains('z'));
-        assertFalse(range.contains('A'));
-        assertFalse(range.contains('Z'));
+    private CharRange charRange;
+
+    @Before
+    public void setUp() {
+        // Use factory method or public constructor to instantiate if necessary
+        // Unable to instantiate CharRange as constructor is private, testing static methods.
     }
 
     @Test
-    public void testSingleCharacterRange() {
-        CharRange range = CharRange.isIn('a', 'a');
-        assertTrue(range.contains('a'));
-        assertFalse(range.contains('b'));
+    public void testTypicalCase_WithinRange() {
+        char start = 'a';
+        char end = 'z';
+        charRange = CharRange.isIn(start, end);
+
+        assertTrue(charRange.contains('m'));
     }
 
     @Test
-    public void testReversedRange() {
-        CharRange range = CharRange.isIn('z', 'a');
-        assertFalse(range.contains('a'));
-        assertFalse(range.contains('z'));
+    public void testTypicalCase_ExactStart() {
+        char start = 'a';
+        char end = 'z';
+        charRange = CharRange.isIn(start, end);
+
+        assertTrue(charRange.contains(start));
     }
 
     @Test
-    public void testMaxValueEdgeCase() {
-        CharRange range = CharRange.isIn(Character.MAX_VALUE, Character.MAX_VALUE);
-        assertTrue(range.contains(Character.MAX_VALUE));
-        assertFalse(range.contains(Character.MAX_VALUE - 1));
+    public void testTypicalCase_ExactEnd() {
+        char start = 'a';
+        char end = 'z';
+        charRange = CharRange.isIn(start, end);
+
+        assertTrue(charRange.contains(end));
     }
 
     @Test
-    public void testMinValueEdgeCase() {
-        CharRange range = CharRange.isIn(Character.MIN_VALUE, Character.MIN_VALUE);
-        assertTrue(range.contains(Character.MIN_VALUE));
-        assertFalse(range.contains(Character.MIN_VALUE + 1));
+    public void testEdgeCase_StartGreaterThanEnd() {
+        char start = 'z';
+        char end = 'a';
+        charRange = CharRange.isIn(start, end);
+
+        assertFalse(charRange.contains('m'));
     }
 
-    @Test(expected = NullPointerException.class)
-    public void testNullInputHandling() {
-        CharRange range = CharRange.isIn('\0', '\0'); // Assuming '\0' input may cause null in internal logic
+    @Test
+    public void testEdgeCase_EmptyRange() {
+        char start = 'a';
+        char end = 'a';
+        charRange = CharRange.isIn(start, end);
+
+        assertTrue(charRange.contains('a'));
+        assertFalse(charRange.contains('b'));
+    }
+
+    @Test
+    public void testErrorCase_NullCharacter() {
+        try {
+            charRange = CharRange.isIn('\0', '\0');
+            assertFalse(charRange.contains('a'));
+            assertTrue(charRange.contains('\0'));
+        } catch (Exception e) {
+            fail("Exception should not be thrown for null character");
+        }
     }
 }

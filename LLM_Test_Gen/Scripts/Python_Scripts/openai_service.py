@@ -23,7 +23,8 @@ def generate_test_from_prompt_template(
     branch_count: str,
     external_dependencies: str,
     literal_constants: str,
-    constructor_visibility: str
+    constructor_visibility: str,
+    class_factory_methods: str
 ) -> str:
     template = None
     template_file_path = None
@@ -51,6 +52,7 @@ def generate_test_from_prompt_template(
     template = template.replace("%%external_dependencies%%", external_dependencies)
     template = template.replace("%%literal_constants%%", literal_constants)
     template = template.replace("%%constructor_visibility%%", constructor_visibility)
+    template = template.replace("%%class_factory_methods%%", class_factory_methods)
     response = client.responses.create(
         model="gpt-4o",
         input=template

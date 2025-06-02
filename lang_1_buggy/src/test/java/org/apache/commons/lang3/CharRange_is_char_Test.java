@@ -10,21 +10,47 @@ import static org.junit.Assert.*;
 @RunWith(JUnit4.class)
 public class CharRange_is_char_Test {
 
-    @Test
-    public void testCharRangeSingleCharacter() {
-        CharRange result = CharRange.is('a');
-        assertNotNull(result);
-        assertEquals('a', result.getStart());
-        assertEquals('a', result.getEnd());
-        assertFalse(result.isNegated());
+    private char singleChar;
+    private CharRange charRange;
+
+    @Before
+    public void setUp() {
+        this.singleChar = 'a';
+        this.charRange = CharRange.is(singleChar);
     }
 
     @Test
-    public void testCharRangeWithDifferentCharacter() {
-        CharRange result = CharRange.is('z');
-        assertNotNull(result);
-        assertEquals('z', result.getStart());
-        assertEquals('z', result.getEnd());
-        assertFalse(result.isNegated());
+    public void testSingleCharInRange() {
+        assertTrue(charRange.contains(singleChar));
+    }
+
+    @Test
+    public void testCharNotInRange() {
+        assertFalse(charRange.contains('b'));
+    }
+
+    @Test
+    public void testRangeWithSameChar() {
+        CharRange sameCharRange = CharRange.is('a');
+        assertEquals(charRange, sameCharRange);
+    }
+
+    @Test
+    public void testEdgeCaseMinChar() {
+        CharRange minCharRange = CharRange.is(Character.MIN_VALUE);
+        assertTrue(minCharRange.contains(Character.MIN_VALUE));
+        assertFalse(minCharRange.contains('a'));
+    }
+
+    @Test
+    public void testEdgeCaseMaxChar() {
+        CharRange maxCharRange = CharRange.is(Character.MAX_VALUE);
+        assertTrue(maxCharRange.contains(Character.MAX_VALUE));
+        assertFalse(maxCharRange.contains('a'));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testNullInput() {
+        CharRange nullCharRange = CharRange.is((Character) null);
     }
 }

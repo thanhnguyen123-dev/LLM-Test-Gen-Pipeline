@@ -39,6 +39,8 @@ Test Generator {
 
         constructor_visibility: It describes the visibility of the constructor. Possible values are public, private, protected, package-private. If private, tests must use public static methods if any, rather than instantiate the class.
 
+        class_factory_methods: It is a comma-separated list of all public static factory methods returning an instance of the class. If constructor is private, and this list is available, you must use the factory methods to instantiate the class.
+
         generated_test_code: The generated test code for the focal method.
     } 
 
@@ -47,30 +49,35 @@ Test Generator {
 
         @rule1: A test class is defined as a class that contains test methods for the focal method. It has the following naming format: <ClassName>_<MethodName>_<Param1>_<Param2>_..._Test.java. For example, if the focal method fqn is org.apache.commons.lang3.text.translate.CodePointTranslator.translate(java.lang.CharSequence, int, java.io.Writer), and the signature is int translate(java.lang.CharSequence, int, java.io.Writer), the test class name should be CodePointTranslator_int_translate_CharSequence_int_Writer_Test.java.
         @rule2: Do NOT rewrite or copy-paste the focal method body. Only writes test that calls the focal method.
-        @rule3: Use JUnit 4 and JDK 8 for writing the test cases. Include all necessary imports. Every test class should have be placed in package org.apache.commons.lang3;
+        @rule3: Use JUnit 4 and JDK 8 for writing the test cases. Do notimport any thirst-party mocking frameworks. If you really need to observe whether `initialize()` was called, create an anonymous subclass and set a boolean field inside `initialize()`, rather than using a mock/spy.Include all necessary imports. Every test class should have be placed in package org.apache.commons.lang3;
         @rule4: If it is necessary to test for "throws Exception", use try-catch block to handle the exception, 
             rather than using assertThrows.
         @rule5: Place every test class in package `org.apache.commons.lang3`. That means the first line of the test class should be `package org.apache.commons.lang3;`.
         @rule6: Use annotations `@RunWith(JUnit4.class)` on the test class and `@Before` for any setup method if necessary. Whether we need the setUp method, refer to @rule8 later for more details. Each test method must have a unique name and be annotated with `@Test`.
         @rule7: A test class is allowed to have multiple test methods.
-        @rule8: If method_modifiers contains `static`, do not instantiate the class. Instead call the focal method as `ClassName.methodName(args)`. 
-        If method_modfiers does NOT contain `static`, during setUp you must instantiate the class. But you still need to pay attention to these details:
-            - If the class has constructor_visibility as `public` (or `protected`, `package-private` that is effectively accessible), you may instantiate the class as `new ClassName(...)`. Pay attention to the class context and class fields for the constructor parameters.
-            - If the class has constructor_visibility as `private`, you must use public static methods if any, rather than instantiate the class. Because the constructor is not accessible.
-        @rule9: A successful test suite should cover:
+        @rule8: 
+            8.1 If `method_modifiers` contains `static`, do not instantiate the class. Instead call the focal method as `ClassName.methodName(args)`. 
+            8.2 If `method_modifiers` does NOT contain `static`, you must obtain an instance before calling the focal method. Inspect `constructor_visibility`:
+                - If `constructor_visibility` is `public` (or `protected`, `package-private` that is effectively accessible), you may instantiate the class as `new ClassName(...)`. Use `class_context` and `class_fields` to determine which constructor signature and arguments to supply.
+                - If `constructor_visibility = "private"`, you CANNOT write any `new ClassName(...)`. Instead, look at `class_factory_methods`, which lists all public static factories returning this class. Use any of these factory methods to instantiate the class that helps testing the focal method.
+                - If `class_factory_methods` is empty, you CANNOT instantiate the class. Simply add a comment to the test class that you cannot instantiate the class because there are no public static factory methods. Then proceed to only test any public static methods.
+            8.3 If `method_modifiers` contains `private static`, you simply cannot invoke the method directly. Just leave a comment to that effect. Therefore, for this situation, you still create a test class, but you do not write any test methods.
+        @rule9: The public static `class_factory_methods` you see may be as a list of empty string, or something like this example "foo(int), bar(String, int)", etc. 
+            You must use the factory methods to instantiate the class. Pay attention to the parameter types and the number of parameters. For example, the list "foo(int), bar(String, int)" must be comprehended as "foo(int) and bar(String, int)", which is a list of two factory methods.
+        @rule10: A successful test suite should cover:
             - Typical use cases.
             - Edge cases (e.g. empty inputs, single-element inputs, zero values, boundary values like Integer.MAX_VALUE/MIN_VALUE.
             These are examples only, they may vary between each method).
             - Corner cases specific to the logic revealed in the Jimple code (e.g. specific loop conditions, branch conditions).
             - Error cases (e.g., null inputs if applicable, conditions leading to exceptions like IllegalArgumentException as shown in Jimple, once again, these are examples only, it depends on the method logic itself).
             - Any other cases that you think are necessary to cover the method logic.
-        @rule10: Aim for high branch and line coverage. As high as possible is the goal.
-        @rule11: Do NOT include any explanatory text, greetings, or summaries before or after the Java code block. Start directly with the `package` or `import` statements and end with the final closing brace `}` of the test class.
-        @rule12: Please follow rules 1-11 strictly!
+        @rule11: Aim for high branch and line coverage. As high as possible is the goal.
+        @rule12: Do NOT include any explanatory text, greetings, or summaries before or after the Java code block. Start directly with the `package` or `import` statements and end with the final closing brace `}` of the test class.
+        @rule13: Please follow rules 1-12 strictly!
 
         @format { 
             After carefully read the above instructions, you can start to generate the test class for the focal method.
-            @input: %%fqn%%, %%signature%%, %%jimple_code_representation%%, %%is_constructor%%, %%method_modifiers%%, %%annotations%%, %%java_doc%%, %%class_context%%, %%class_fields%%, %%loop_count%%, %%branch_count%%, %%external_dependencies%%, %%literal_constants%%, %%constructor_visibility%%
+            @input: %%fqn%%, %%signature%%, %%jimple_code_representation%%, %%is_constructor%%, %%method_modifiers%%, %%annotations%%, %%java_doc%%, %%class_context%%, %%class_fields%%, %%loop_count%%, %%branch_count%%, %%external_dependencies%%, %%literal_constants%%, %%constructor_visibility%%, %%class_factory_methods%%
             @output: %%generated_test_code%%
         } 
     } 

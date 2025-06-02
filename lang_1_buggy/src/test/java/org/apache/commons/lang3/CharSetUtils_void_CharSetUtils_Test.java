@@ -1,7 +1,7 @@
 package org.apache.commons.lang3;
 
-import org.junit.Test;
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
@@ -16,8 +16,9 @@ public class CharSetUtils_void_CharSetUtils_Test {
     }
 
     @Test
-    public void testConstructor() {
-        // Test if the instance is created successfully
-        assert charSetUtils != null;
+    public void testCharSetUtilsConstructor() {
+        // Test to confirm the constructor works without exceptions.
+        // Since there's no specific functionality to test in the constructor,
+        // this will only confirm instantiation.
     }
 }

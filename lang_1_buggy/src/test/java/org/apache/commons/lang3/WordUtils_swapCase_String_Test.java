@@ -1,65 +1,57 @@
 package org.apache.commons.lang3;
 
+import org.apache.commons.lang3.text.WordUtils;
 import org.junit.Test;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-
 import static org.junit.Assert.*;
 
 @RunWith(JUnit4.class)
 public class WordUtils_swapCase_String_Test {
 
-    @Before
-    public void setUp() {
-        // No setup required for static method
-    }
-
     @Test
-    public void testSwapCase_NullInput() {
+    public void testSwapCase_withNullInput() {
         assertNull(WordUtils.swapCase(null));
     }
 
     @Test
-    public void testSwapCase_EmptyString() {
+    public void testSwapCase_withEmptyString() {
         assertEquals("", WordUtils.swapCase(""));
     }
 
     @Test
-    public void testSwapCase_TypicalUseCase() {
+    public void testSwapCase_withUppercase() {
+        assertEquals("hello", WordUtils.swapCase("HELLO"));
+    }
+
+    @Test
+    public void testSwapCase_withLowercase() {
+        assertEquals("HELLO", WordUtils.swapCase("hello"));
+    }
+
+    @Test
+    public void testSwapCase_withMixedCase() {
         assertEquals("tHE DOG HAS A bone", WordUtils.swapCase("The dog has a BONE"));
     }
 
     @Test
-    public void testSwapCase_AllUpperCase() {
-        assertEquals("all upper", WordUtils.swapCase("ALL UPPER"));
+    public void testSwapCase_withTitleCaseCharacter() {
+        assertEquals("tHis Is A tEst", WordUtils.swapCase("This is a Test"));
     }
 
     @Test
-    public void testSwapCase_AllLowerCase() {
-        assertEquals("ALL LOWER", WordUtils.swapCase("all lower"));
+    public void testSwapCase_withWhitespaceAndLowercase() {
+        assertEquals("Hello World", WordUtils.swapCase("hELLO wORLD"));
     }
 
     @Test
-    public void testSwapCase_TitleCase() {
-        assertEquals("tHis IS a Title", WordUtils.swapCase("This is A tITLE"));
+    public void testSwapCase_withNoWhitespace() {
+        assertEquals("jAVA pROGRAM", WordUtils.swapCase("Java Program"));
     }
 
     @Test
-    public void testSwapCase_SingleCharacter() {
-        assertEquals("A", WordUtils.swapCase("a"));
-        assertEquals("a", WordUtils.swapCase("A"));
-    }
-
-    @Test
-    public void testSwapCase_SpecialCharacters() {
-        assertEquals("123 !@#", WordUtils.swapCase("123 !@#"));
-        assertEquals("hElLo WorlD!", WordUtils.swapCase("HeLlO wORLd!"));
-    }
-
-    @Test
-    public void testSwapCase_WhitespaceHandling() {
-        assertEquals("hELLO\nWORLD", WordUtils.swapCase("Hello\nWorld"));
-        assertEquals("hELLO\tWORLD", WordUtils.swapCase("Hello\tWorld"));
+    public void testSwapCase_withSpecialCharacters() {
+        assertEquals("123 ABC!#", WordUtils.swapCase("123 abc!#"));
     }
 }

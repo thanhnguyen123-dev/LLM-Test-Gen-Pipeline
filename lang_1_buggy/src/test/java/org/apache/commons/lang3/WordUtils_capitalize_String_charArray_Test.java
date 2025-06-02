@@ -6,27 +6,27 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 @RunWith(JUnit4.class)
 public class WordUtils_capitalize_String_charArray_Test {
 
-    private WordUtils wordUtils;
+    private char[] defaultDelimiters;
 
     @Before
     public void setUp() {
-        wordUtils = new WordUtils();
+        // Set up default delimiters
+        defaultDelimiters = new char[]{' '};
     }
 
     @Test
     public void testCapitalize_NullInput() {
-        assertNull(WordUtils.capitalize(null, new char[]{'.'}));
+        assertNull(WordUtils.capitalize(null, defaultDelimiters));
     }
 
     @Test
     public void testCapitalize_EmptyString() {
-        assertEquals("", WordUtils.capitalize("", new char[]{' '}));
+        assertEquals("", WordUtils.capitalize("", defaultDelimiters));
     }
 
     @Test
@@ -35,37 +35,42 @@ public class WordUtils_capitalize_String_charArray_Test {
     }
 
     @Test
-    public void testCapitalize_SingleCharacterDelimiters() {
-        assertEquals("I AM.Fine", WordUtils.capitalize("i aM.fine", new char[]{'.'}));
+    public void testCapitalize_WithDelimiters() {
+        assertEquals("I aM.Fine", WordUtils.capitalize("i aM.fine", new char[]{'.'}));
     }
 
     @Test
     public void testCapitalize_MixedDelimiters() {
-        assertEquals("I Am, Fine!", WordUtils.capitalize("i am, fine!", new char[]{',', ' '}));
+        assertEquals("Hello-World", WordUtils.capitalize("hello-world", new char[]{'-'}));
     }
 
     @Test
-    public void testCapitalize_MultipleConsecutiveDelimiters() {
-        assertEquals("I  Am", WordUtils.capitalize("i  am", new char[]{' '}));
+    public void testCapitalize_SingleCharacter() {
+        assertEquals("I", WordUtils.capitalize("i", defaultDelimiters));
     }
 
     @Test
-    public void testCapitalize_NumericString() {
-        assertEquals("123 a", WordUtils.capitalize("123 a", new char[]{' '}));
+    public void testCapitalize_MultipleSpaces() {
+        assertEquals("A  B C", WordUtils.capitalize("a  b c", new char[]{' '}));
     }
 
     @Test
-    public void testCapitalize_AllUpperCase() {
-        assertEquals("I AM Fine", WordUtils.capitalize("I AM fine", new char[]{' '}));
+    public void testCapitalize_SpecialCharacters() {
+        assertEquals("!Hi!There", WordUtils.capitalize("!hi!there", new char[]{'!'}));
     }
 
     @Test
-    public void testCapitalize_AllLowerCase() {
-        assertEquals("I Am Fine", WordUtils.capitalize("i am fine", new char[]{' '}));
+    public void testCapitalize_LeadingTrailingSpaces() {
+        assertEquals(" Abc ", WordUtils.capitalize(" abc ", new char[]{' '}));
     }
 
     @Test
-    public void testCapitalize_EmptyDelimiters() {
-        assertEquals("Test", WordUtils.capitalize("test", new char[]{}));
+    public void testCapitalize_AllUpperCaseInput() {
+        assertEquals("Hello World", WordUtils.capitalize("HELLO WORLD", defaultDelimiters));
+    }
+
+    @Test
+    public void testCapitalize_NoDelimitersInString() {
+        assertEquals("Abc", WordUtils.capitalize("abc", new char[]{'.'}));
     }
 }

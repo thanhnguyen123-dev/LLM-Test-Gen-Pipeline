@@ -9,49 +9,51 @@ import static org.junit.Assert.*;
 @RunWith(JUnit4.class)
 public class CharRange_boolean_contains_char_Test {
 
-    private CharRange rangeNonNegated;
-    private CharRange rangeNegated;
+    private CharRange charRange;
+    private CharRange negatedCharRange;
 
     @Before
     public void setUp() {
-        rangeNonNegated = CharRange.is('a', 'z');
-        rangeNegated = CharRange.isNot('a', 'z');
+        charRange = CharRange.isIn('a', 'z');
+        negatedCharRange = CharRange.isNotIn('a', 'z');
     }
 
     @Test
-    public void testContainsTypicalCase() {
-        assertTrue(rangeNonNegated.contains('c'));
-        assertFalse(rangeNegated.contains('c'));
+    public void testContainsWithinRange() {
+        assertTrue(charRange.contains('a'));
+        assertTrue(charRange.contains('m'));
+        assertTrue(charRange.contains('z'));
     }
 
     @Test
-    public void testContainsEdgeCaseStart() {
-        assertTrue(rangeNonNegated.contains('a'));
-        assertFalse(rangeNegated.contains('a'));
+    public void testContainsOutsideRange() {
+        assertFalse(charRange.contains('A'));
+        assertFalse(charRange.contains('0'));
+        assertFalse(charRange.contains('!'));
     }
 
     @Test
-    public void testContainsEdgeCaseEnd() {
-        assertTrue(rangeNonNegated.contains('z'));
-        assertFalse(rangeNegated.contains('z'));
+    public void testContainsNegated() {
+        assertFalse(negatedCharRange.contains('a'));
+        assertFalse(negatedCharRange.contains('m'));
+        assertFalse(negatedCharRange.contains('z'));
+        assertTrue(negatedCharRange.contains('A'));
+        assertTrue(negatedCharRange.contains('0'));
     }
 
     @Test
-    public void testContainsBeforeStart() {
-        assertFalse(rangeNonNegated.contains('`'));
-        assertTrue(rangeNegated.contains('`'));
+    public void testContainsEmptyRange() {
+        CharRange emptyRange = CharRange.isIn('x', 'x');
+        assertTrue(emptyRange.contains('x'));
+        assertFalse(emptyRange.contains('y'));
     }
 
     @Test
-    public void testContainsAfterEnd() {
-        assertFalse(rangeNonNegated.contains('{'));
-        assertTrue(rangeNegated.contains('{'));
-    }
-
-    @Test
-    public void testContainsSingleCharRange() {
-        CharRange singleCharRange = CharRange.is('m');
-        assertTrue(singleCharRange.contains('m'));
-        assertFalse(singleCharRange.contains('n'));
+    public void testContainsAllRange() {
+        CharRange fullRange = CharRange.isIn(Character.MIN_VALUE, Character.MAX_VALUE);
+        assertTrue(fullRange.contains('a'));
+        assertTrue(fullRange.contains('Z'));
+        assertTrue(fullRange.contains(Character.MIN_VALUE));
+        assertTrue(fullRange.contains(Character.MAX_VALUE));
     }
 }

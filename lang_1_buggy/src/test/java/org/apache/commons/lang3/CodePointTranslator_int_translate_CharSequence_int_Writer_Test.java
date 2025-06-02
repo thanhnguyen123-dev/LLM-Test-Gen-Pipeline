@@ -1,6 +1,7 @@
 package org.apache.commons.lang3;
 
 import org.apache.commons.lang3.text.translate.CodePointTranslator;
+import org.apache.commons.lang3.text.translate.CharSequenceTranslator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,61 +11,85 @@ import java.io.StringWriter;
 import java.io.Writer;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 @RunWith(JUnit4.class)
 public class CodePointTranslator_int_translate_CharSequence_int_Writer_Test {
 
-    private CodePointTranslator codePointTranslator;
+    private CodePointTranslator translator;
 
     @Before
     public void setUp() {
-        codePointTranslator = new CodePointTranslator();
+        translator = new CodePointTranslator() {
+            @Override
+            public boolean translate(int codepoint, Writer out) {
+                return false; // Stub implementation for testing
+            }
+        };
     }
 
     @Test
-    public void testTranslateTypicalCase() throws Exception {
-        String input = "abcdef";
-        Writer out = new StringWriter();
-        int result = codePointTranslator.translate(input, 0, out);
-        assertEquals(1, result);
+    public void testTranslateTypicalUseCase() {
+        try {
+            String input = "abc";
+            int index = 0;
+            StringWriter writer = new StringWriter();
+
+            int result = translator.translate(input, index, writer);
+
+            assertEquals(1, result); // Assuming consumed by default behavior
+        } catch (Exception e) {
+            fail("Exception should not be thrown");
+        }
     }
 
     @Test
-    public void testTranslateEndIndex() throws Exception {
-        String input = "abcdef";
-        Writer out = new StringWriter();
-        int result = codePointTranslator.translate(input, 5, out);
-        assertEquals(1, result);
+    public void testTranslateEmptyInput() {
+        try {
+            String input = "";
+            int index = 0;
+            StringWriter writer = new StringWriter();
+
+            int result = translator.translate(input, index, writer);
+
+            assertEquals(0, result);
+        } catch (Exception e) {
+            fail("Exception should not be thrown");
+        }
     }
 
     @Test
-    public void testTranslateEmptyInput() throws Exception {
-        String input = "";
-        Writer out = new StringWriter();
-        int result = codePointTranslator.translate(input, 0, out);
-        assertEquals(0, result);
-    }
+    public void testTranslateEndIndex() {
+        try {
+            String input = "a";
+            int index = 1;
+            StringWriter writer = new StringWriter();
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void testTranslateIndexOutOfBounds() throws Exception {
-        String input = "abcd";
-        Writer out = new StringWriter();
-        codePointTranslator.translate(input, 10, out);
-    }
+            int result = translator.translate(input, index, writer);
 
-    @Test
-    public void testTranslateValidCodepointBoundary() throws Exception {
-        String input = new String(Character.toChars(Character.MAX_CODE_POINT));
-        Writer out = new StringWriter();
-        int result = codePointTranslator.translate(input, 0, out);
-        assertEquals(1, result);
+            assertEquals(0, result);
+        } catch (Exception e) {
+            fail("Exception should not be thrown");
+        }
     }
 
     @Test
-    public void testTranslateSingleCharacter() throws Exception {
-        String input = "a";
-        Writer out = new StringWriter();
-        int result = codePointTranslator.translate(input, 0, out);
-        assertEquals(1, result);
+    public void testTranslateThrowsExceptionOnNullInput() {
+        try {
+            translator.translate(null, 0, new StringWriter());
+            fail("Exception should have been thrown");
+        } catch (Exception e) {
+            // Expected exception
+        }
+    }
+
+    @Test
+    public void testTranslateThrowsExceptionOnNullWriter() {
+        try {
+            translator.translate("abc", 0, null);
+            fail("Exception should have been thrown");
+        } catch (Exception e) {
+            // Expected exception
+        }
     }
 }
