@@ -46,8 +46,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class InfoExtractorRunner {
-    private static final String TEST_DATA_RELATIVE_PATH = "../../Data/Test_Data.csv";
-    private static final String LANG_1_BUGGY_SRC_RELATIVE_PATH = "../../../lang_1_buggy/src/main/java";
+    private static final String TEST_DATA_RELATIVE_PATH = "../../../Data/Test_Data.csv";
+    private static final String LANG_1_BUGGY_SRC_RELATIVE_PATH = "../../../../lang_1_buggy/src/main/java";
     private static final String CSV_DELIMITER = ",";
     private static final String[] CSV_COLUMNS = {
             "FQN",
@@ -62,15 +62,14 @@ public class InfoExtractorRunner {
             "Loop Count",
             "Branch Count",
             "External Dependencies",
-            "Literal Constants"
+            "Literal Constants",
+            "Constructor Visibility"
     };
 
     private static final String CSV_HEADER = InfoExtractorRunner.getCsvHeader();
     private static final JavaParser parser = createJavaParser();
-
-
     public static void main(String[] args) {
-        String targetClassesPathToLang1Buggy = "../../../lang_1_buggy/target/classes";
+        String targetClassesPathToLang1Buggy = "../../../../lang_1_buggy/target/classes";
 
         Path moduleBasePath = Paths.get(".").toAbsolutePath().normalize();
         Path outputCsvAbsPath = moduleBasePath.resolve(TEST_DATA_RELATIVE_PATH).normalize();
@@ -172,6 +171,38 @@ public class InfoExtractorRunner {
                                 .orElseThrow(() -> new RuntimeException("Method not found: " + methodName));
                     }
 
+                    String constructorVisibility;
+                    if (methodDeclaration instanceof ConstructorDeclaration) {
+                        ConstructorDeclaration constructorDeclaration = (ConstructorDeclaration) methodDeclaration;
+                        if (constructorDeclaration.isPublic()) {
+                            constructorVisibility = "public";
+                        } else if (constructorDeclaration.isProtected()) {
+                            constructorVisibility = "protected";
+                        } else if (constructorDeclaration.isPrivate()) {
+                            constructorVisibility = "private";
+                        } else {
+                            constructorVisibility = "package-private"; // package-private
+                        }
+                    } else {
+                        List<ConstructorDeclaration> allConstructors = classOrInterfaceDeclaration.getConstructors();
+                        if (allConstructors.isEmpty()) {
+                            constructorVisibility = "public";
+                        } else {
+                            boolean anyPublic = allConstructors.stream().anyMatch(ConstructorDeclaration::isPublic);
+                            boolean anyProtected = allConstructors.stream().anyMatch(ConstructorDeclaration::isProtected);
+                            boolean anyPrivate = allConstructors.stream().anyMatch(ConstructorDeclaration::isPrivate);
+                            if (anyPublic) {
+                                constructorVisibility = "public";
+                            } else if (anyProtected) {
+                                constructorVisibility = "protected";
+                            } else if (anyPrivate) {
+                                constructorVisibility = "private";
+                            } else {
+                                constructorVisibility = "package-private"; // package-private
+                            }
+                        }
+                    }
+
                     // Get the FQN
                     String methodNameToUse = methodName.equals("<init>") ? simpleClassName : methodName;
 
@@ -232,7 +263,6 @@ public class InfoExtractorRunner {
                     }
                     List<String> interfaces = sootClass.getInterfaces().stream()
                             .map(ct -> ct.getFullyQualifiedName())
-//                            .filter(name -> !name.equals("java.io.Serializable"))
                             .collect(Collectors.toList());
                     String classContext;
                     if (!superName.isEmpty() && !interfaces.isEmpty()) {
@@ -303,6 +333,8 @@ public class InfoExtractorRunner {
                             .distinct()
                             .collect(Collectors.joining(", "));
 
+                    // Extract class factory method
+
                     // Construct a CSV line
                     String csvLine = String.join(
                             CSV_DELIMITER,
@@ -318,7 +350,8 @@ public class InfoExtractorRunner {
                             quoteField(String.valueOf(loopCount)),
                             quoteField(String.valueOf(branchCount)),
                             quoteField(externalCallsRaw),
-                            quoteField(literalsRaw)
+                            quoteField(literalsRaw),
+                            quoteField(constructorVisibility)
 
                     );
                     writer.println(csvLine);
@@ -334,6 +367,11 @@ public class InfoExtractorRunner {
                     System.out.println("- JavaDoc: " + rawJavaDoc);
                     System.out.println("- Class Context: " + classContext);
                     System.out.println("- Class Fields: " + classFields);
+                    System.out.println("- Loop Count: " + loopCount);
+                    System.out.println("- Branch Count: " + branchCount);
+                    System.out.println("- External Dependencies: " + externalCallsRaw);
+                    System.out.println("- Literal Constants: " + literalsRaw);
+                    System.out.println("- Constructor Visibility: " + constructorVisibility);
                     System.out.println("-----------------------------------------------------------------");
                 }
             }

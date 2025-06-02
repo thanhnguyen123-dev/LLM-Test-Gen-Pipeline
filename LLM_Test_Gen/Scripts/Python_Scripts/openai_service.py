@@ -1,6 +1,10 @@
 from openai import OpenAI
 from pathlib import Path
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 RELATIVE_PATH_TO_PROMPT_TEMPLATE = "../../Data/Prompts/prompt_template.txt"
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -19,6 +23,7 @@ def generate_test_from_prompt_template(
     branch_count: str,
     external_dependencies: str,
     literal_constants: str,
+    constructor_visibility: str
 ) -> str:
     template = None
     template_file_path = None
@@ -45,7 +50,7 @@ def generate_test_from_prompt_template(
     template = template.replace("%%branch_count%%", branch_count)
     template = template.replace("%%external_dependencies%%", external_dependencies)
     template = template.replace("%%literal_constants%%", literal_constants)
-
+    template = template.replace("%%constructor_visibility%%", constructor_visibility)
     response = client.responses.create(
         model="gpt-4o",
         input=template

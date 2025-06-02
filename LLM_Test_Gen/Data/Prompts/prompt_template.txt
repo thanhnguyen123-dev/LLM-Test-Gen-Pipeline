@@ -19,7 +19,7 @@ Test Generator {
 
         is_constructor: Indicates whether the method is a constructor or just a regular method
 
-        method_modifiers: It describes the access level of the method, whether it is public, private, protected, etc.
+        method_modifiers: It describes the access level of the method, whether it is public, private, static, protected, etc.
 
         annotations: It provides the annotations of the method, such as @Override, @Deprecated, etc.
 
@@ -37,6 +37,8 @@ Test Generator {
 
         literal_constants: It is a comma-separated list of all literal constants used in the method, each rendered as "literalValue".
 
+        constructor_visibility: It describes the visibility of the constructor. Possible values are public, private, protected, package-private. If private, tests must use public static methods if any, rather than instantiate the class.
+
         generated_test_code: The generated test code for the focal method.
     } 
 
@@ -44,27 +46,31 @@ Test Generator {
         @command: Given the above code information in the @terminology section, generate a test class for the focal method. 
 
         @rule1: A test class is defined as a class that contains test methods for the focal method. It has the following naming format: <ClassName>_<MethodName>_<Param1>_<Param2>_..._Test.java. For example, if the focal method fqn is org.apache.commons.lang3.text.translate.CodePointTranslator.translate(java.lang.CharSequence, int, java.io.Writer), and the signature is int translate(java.lang.CharSequence, int, java.io.Writer), the test class name should be CodePointTranslator_int_translate_CharSequence_int_Writer_Test.java.
-        @rule2: You don’t need to rewrite the focal method in the test code. 
-        @rule3: Use JUnit 4 and JDK 8 for writing the test cases. Include all necessary imports.
+        @rule2: Do NOT rewrite or copy-paste the focal method body. Only writes test that calls the focal method.
+        @rule3: Use JUnit 4 and JDK 8 for writing the test cases. Include all necessary imports. Every test class should have be placed in package org.apache.commons.lang3;
         @rule4: If it is necessary to test for "throws Exception", use try-catch block to handle the exception, 
             rather than using assertThrows.
-        @rule5: A test class should have a constructor with the @BeforeEach annotation to initialize class field(s) for test data.
-        @rule6: A test class is allowed to have multiple test methods.
-        @rule7: A test method should have the @Test annotation. In a class, test methods name should have unique names.
-        @rule8: A successful test suite should cover:
+        @rule5: Place every test class in package `org.apache.commons.lang3`. That means the first line of the test class should be `package org.apache.commons.lang3;`.
+        @rule6: Use annotations `@RunWith(JUnit4.class)` on the test class and `@Before` for any setup method if necessary. Whether we need the setUp method, refer to @rule8 later for more details. Each test method must have a unique name and be annotated with `@Test`.
+        @rule7: A test class is allowed to have multiple test methods.
+        @rule8: If method_modifiers contains `static`, do not instantiate the class. Instead call the focal method as `ClassName.methodName(args)`. 
+        If method_modfiers does NOT contain `static`, during setUp you must instantiate the class. But you still need to pay attention to these details:
+            - If the class has constructor_visibility as `public` (or `protected`, `package-private` that is effectively accessible), you may instantiate the class as `new ClassName(...)`. Pay attention to the class context and class fields for the constructor parameters.
+            - If the class has constructor_visibility as `private`, you must use public static methods if any, rather than instantiate the class. Because the constructor is not accessible.
+        @rule9: A successful test suite should cover:
             - Typical use cases.
             - Edge cases (e.g. empty inputs, single-element inputs, zero values, boundary values like Integer.MAX_VALUE/MIN_VALUE.
             These are examples only, they may vary between each method).
             - Corner cases specific to the logic revealed in the Jimple code (e.g. specific loop conditions, branch conditions).
             - Error cases (e.g., null inputs if applicable, conditions leading to exceptions like IllegalArgumentException as shown in Jimple, once again, these are examples only, it depends on the method logic itself).
             - Any other cases that you think are necessary to cover the method logic.
-        @rule9: Aim for high branch and line coverage.
-        @rule10: Do NOT include any explanatory text, greetings, or summaries before or after the Java code block. Start directly with the `package` or `import` statements and end with the final closing brace `}` of the test class.
-        @rule: Please follow rules 1-10 strictly!
+        @rule10: Aim for high branch and line coverage. As high as possible is the goal.
+        @rule11: Do NOT include any explanatory text, greetings, or summaries before or after the Java code block. Start directly with the `package` or `import` statements and end with the final closing brace `}` of the test class.
+        @rule12: Please follow rules 1-11 strictly!
 
         @format { 
             After carefully read the above instructions, you can start to generate the test class for the focal method.
-            @input: %%fqn%%, %%signature%%, %%jimple_code_representation%%, %%is_constructor%%, %%method_modifiers%%, %%annotations%%, %%java_doc%%, %%class_context%%, %%class_fields%%, %%loop_count%%, %%branch_count%%, %%external_dependencies%%, %%literal_constants%%
+            @input: %%fqn%%, %%signature%%, %%jimple_code_representation%%, %%is_constructor%%, %%method_modifiers%%, %%annotations%%, %%java_doc%%, %%class_context%%, %%class_fields%%, %%loop_count%%, %%branch_count%%, %%external_dependencies%%, %%literal_constants%%, %%constructor_visibility%%
             @output: %%generated_test_code%%
         } 
     } 
