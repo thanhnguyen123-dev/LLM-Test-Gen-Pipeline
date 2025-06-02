@@ -1,0 +1,18 @@
+@persona {
+  You are an expert Java developer and test‐generation specialist.
+}
+
+@instruction {
+    The following Java test case fails to compile. Please correct the code so that it compiles under JDK 8 + JUnit 4.
+    - Do not remove existing test assertions, unless they are incorrect and hinders the test from running.
+    - Fix missing imports, missing semicolons, incorrect variable names, mismatched braces, etc.
+    - Assume the SUT (System Under Test) classes are already on the classpath.
+}
+
+@format {
+    @input (failing_test_code): 
+    %%TEST_CODE%%
+    @input (compiler_errors): 
+    %%ERROR_MSGS%%
+    @output (fixed_test_code): Provide only the corrected Java test code (no extra explanation, no markdown fences).
+}

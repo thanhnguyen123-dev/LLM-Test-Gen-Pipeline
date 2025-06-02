@@ -22,14 +22,6 @@ BASE_TEST_DIR = (
 )
 
 def strip_markdown_fences(java_code: str) -> str:
-    """
-    If the code is wrapped like:
-      ```java
-      <actual Java source>
-      ```
-    then remove the first line (```java) and the last line (```).
-    Otherwise, return java_code unchanged.
-    """
     lines = java_code.splitlines()
     if not lines:
         return java_code
@@ -45,11 +37,6 @@ def strip_markdown_fences(java_code: str) -> str:
         return java_code
 
 def extract_class_name(java_code: str) -> str:
-    """
-    Look for a declaration like:
-      public class SomeTestClassName {
-    and return 'SomeTestClassName'. Raise if not found.
-    """
     pattern = re.compile(r"^\s*public\s+class\s+([A-Za-z_]\w*)\b", re.MULTILINE)
     match = pattern.search(java_code)
     if not match:
@@ -59,21 +46,13 @@ def extract_class_name(java_code: str) -> str:
     return match.group(1)
 
 def write_java_file(target_folder: Path, class_name: str, java_code: str):
-    """
-    Writes the normalized java_code to target_folder/<class_name>.java,
-    normalizing line endings and trailing whitespace.
-    """
     file_path = target_folder / f"{class_name}.java"
-
-    # Normalize line endings to Unix style and strip trailing whitespace on each line
     lines = java_code.splitlines()
     cleaned = [line.rstrip() for line in lines]
     normalized = "\n".join(cleaned).strip() + "\n"
-
     with open(file_path, "w", encoding="utf-8") as f:
         f.write(normalized)
-
-    print(f"[INFO] Wrote: {str(file_path).split('/')[-1]}")
+    print(f"[INFO] Wrote: {file_path.name}")
 
 def main():
     if not CSV_PATH.exists():
@@ -81,7 +60,7 @@ def main():
 
     BASE_TEST_DIR.mkdir(parents=True, exist_ok=True)
 
-    output_csv = CSV_PATH.with_name("Generated_Test_Data_WithFormatted.csv")
+    output_csv = CSV_PATH.with_name("Formatted_Generated_Test_Data.csv")
 
     with open(CSV_PATH, newline="", encoding="utf-8") as csvfile, \
          open(output_csv, "w", newline="", encoding="utf-8") as outfile:
@@ -93,13 +72,17 @@ def main():
                 f"Column 'Generated Code' not found. Got: {fieldnames}"
             )
 
-        # Add new column for the (normalized) formatted code
         formatted_column = "Formatted Code"
         if formatted_column in fieldnames:
             raise RuntimeError(f"Column '{formatted_column}' already exists!")
         fieldnames.append(formatted_column)
 
-        writer = csv.DictWriter(outfile, fieldnames=fieldnames)
+        saved_path_column = "Saved Path"
+        if saved_path_column in fieldnames:
+            raise RuntimeError(f"Column '{saved_path_column}' already exists!")
+        fieldnames.append(saved_path_column)
+
+        writer = csv.DictWriter(outfile, fieldnames=fieldnames, quoting=csv.QUOTE_ALL)
         writer.writeheader()
 
         for idx, row in enumerate(reader, start=1):
@@ -107,6 +90,7 @@ def main():
             if not raw_code or raw_code.isspace():
                 print(f"[WARNING] Row {idx} has empty 'Generated Code'. Skipping.")
                 row[formatted_column] = ""
+                row[saved_path_column] = ""
                 writer.writerow(row)
                 continue
 
@@ -117,6 +101,7 @@ def main():
             except RuntimeError as e:
                 print(f"[ERROR] Row {idx}: {e} Skipping.")
                 row[formatted_column] = ""
+                row[saved_path_column] = ""
                 writer.writerow(row)
                 continue
 
@@ -127,9 +112,12 @@ def main():
             normalized = "\n".join(cleaned).strip() + "\n"
             row[formatted_column] = normalized
 
+            relative_path = f"org/apache/commons/lang3/{class_name}.java"
+            row[saved_path_column] = relative_path
+
             writer.writerow(row)
 
-    print(f"[INFO] Wrote updated CSV with formatted code: {output_csv}")
+    print(f"[INFO] Wrote updated CSV with formatted code and Saved Path: {output_csv}")
 
 if __name__ == "__main__":
     main()
