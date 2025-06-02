@@ -1,60 +1,53 @@
 package org.apache.commons.lang3;
 
 import org.apache.commons.lang3.text.WordUtils;
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-
 import static org.junit.Assert.*;
 
-@RunWith(JUnit4.class)
 public class WordUtils_uncapitalize_String_charArray_Test {
 
-    @Before
-    public void setUp() {
-        // Any necessary setup can be done here
-    }
-
     @Test
-    public void testUncapitalize_NullString() {
-        assertNull("Expected null when input string is null",
-                WordUtils.uncapitalize(null, new char[] {'.'}));
+    public void testUncapitalize_NullInput() {
+        assertNull(WordUtils.uncapitalize(null, null));
     }
 
     @Test
     public void testUncapitalize_EmptyString() {
-        assertEquals("Expected empty string when input string is empty",
-                "", WordUtils.uncapitalize("", new char[] {'.'}));
+        assertEquals("", WordUtils.uncapitalize("", null));
     }
 
     @Test
-    public void testUncapitalize_NoDelimiters() {
-        assertEquals("Expected input string when delimiters are null",
-                "I AM FINE", WordUtils.uncapitalize("I AM FINE", null));
+    public void testUncapitalize_NullDelimiters() {
+        assertEquals("i am fine", WordUtils.uncapitalize("I Am Fine", null));
     }
 
     @Test
     public void testUncapitalize_EmptyDelimiters() {
-        assertEquals("Expected input string when delimiters are empty",
-                "I AM FINE", WordUtils.uncapitalize("I AM FINE", new char[0]));
+        assertEquals("i am fine", WordUtils.uncapitalize("I Am Fine", new char[0]));
     }
 
     @Test
-    public void testUncapitalize_WithDelimiters() {
-        assertEquals("Expected specific uncapitalization with delimiters",
-                "i AM.fINE", WordUtils.uncapitalize("I AM.FINE", new char[] {'.'}));
+    public void testUncapitalize_SpecificDelimiters() {
+        assertEquals("i am.fine", WordUtils.uncapitalize("I AM.FINE", new char[]{'.'}));
     }
 
     @Test
-    public void testUncapitalize_NoDelimiters_NonWhitespaceChars() {
-        assertEquals("Expected specific uncapitalization with delimiters",
-                "i am fine", WordUtils.uncapitalize("I am fine", new char[] {' '}));
+    public void testUncapitalize_NoDelimitersInString() {
+        assertEquals("i am fine", WordUtils.uncapitalize("I Am Fine", new char[]{','}));
     }
 
     @Test
-    public void testUncapitalize_MixedDelimiters() {
-        assertEquals("Expected specific uncapitalization with mixed delimiters",
-                "i am.fine", WordUtils.uncapitalize("I AM.FINE", new char[] {'.', ' '}));
+    public void testUncapitalize_SingleCharacterString() {
+        assertEquals("a", WordUtils.uncapitalize("A", null));
+    }
+
+    @Test
+    public void testUncapitalize_NonAlphaFirstCharacter() {
+        assertEquals("!hello world", WordUtils.uncapitalize("!Hello World", null));
+    }
+
+    @Test
+    public void testUncapitalize_FirstCharDelimiter() {
+        assertEquals(".hello", WordUtils.uncapitalize(".Hello", new char[]{'.'}));
     }
 }

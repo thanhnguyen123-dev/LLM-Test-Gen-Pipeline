@@ -2,70 +2,83 @@ package org.apache.commons.lang3;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-import java.util.concurrent.atomic.AtomicReference;
-import org.apache.commons.lang3.concurrent.AtomicInitializer;
-
 import static org.junit.Assert.*;
 
-@RunWith(JUnit4.class)
+import org.apache.commons.lang3.concurrent.AtomicInitializer;
+import org.apache.commons.lang3.concurrent.ConcurrentException;
+import java.util.concurrent.atomic.AtomicReference;
+
 public class AtomicInitializer_Object_get_Test {
 
-    private AtomicInitializer<Object> atomicInitializer;
+    private AtomicInitializer<Object> initializer;
 
     @Before
     public void setUp() {
-        atomicInitializer = new AtomicInitializer<Object>() {
+        initializer = new AtomicInitializer<Object>() {
             @Override
             protected Object initialize() {
-                return new Object();
+                return "initialized";
             }
         };
     }
 
     @Test
-    public void testGet_ReturnsInitializedObject() throws Exception {
-        assertNotNull(atomicInitializer.get());
+    public void testGet_TypicalUseCase() {
+        try {
+            Object result = initializer.get();
+            assertEquals("initialized", result);
+        } catch (ConcurrentException e) {
+            fail("Exception should not have been thrown.");
+        }
     }
 
     @Test
-    public void testGet_SameObjectReturned() throws Exception {
-        Object firstCall = atomicInitializer.get();
-        Object secondCall = atomicInitializer.get();
-        assertSame(firstCall, secondCall);
-    }
-
-    @Test
-    public void testGet_ConcurrentModification() throws Exception {
-        Thread thread = new Thread(() -> {
-            try {
-                atomicInitializer.get();
-            } catch (Exception e) {
-                fail("Exception should not be thrown: " + e.getMessage());
-            }
-        });
-        thread.start();
-        Object mainThreadResult = atomicInitializer.get();
-        thread.join();
-        assertNotNull(mainThreadResult);
-    }
-
-    @Test
-    public void testGet_ReferenceNotInitializedTwice() throws Exception {
-        AtomicReference<Object> ref = new AtomicReference<>();
-        atomicInitializer = new AtomicInitializer<Object>() {
+    public void testGet_ConcurrentAccess() {
+        AtomicReference<Object> reference = new AtomicReference<>(null);
+        AtomicInitializer<Object> concurrentInitializer = new AtomicInitializer<Object>() {
             @Override
             protected Object initialize() {
-                Object obj = new Object();
-                if (!ref.compareAndSet(null, obj)) {
-                    fail("Initialize called more than once");
-                }
-                return obj;
+                reference.compareAndSet(null, "concurrent");
+                return reference.get();
             }
         };
+        try {
+            Object result = concurrentInitializer.get();
+            assertEquals("concurrent", result);
+        } catch (ConcurrentException e) {
+            fail("Exception should not have been thrown.");
+        }
+    }
 
-        Object result = atomicInitializer.get();
-        assertSame(result, ref.get());
+    @Test
+    public void testGet_NullInitializeResult() {
+        AtomicInitializer<Object> nullInitializer = new AtomicInitializer<Object>() {
+            @Override
+            protected Object initialize() {
+                return null;
+            }
+        };
+        try {
+            Object result = nullInitializer.get();
+            assertNull(result);
+        } catch (ConcurrentException e) {
+            fail("Exception should not have been thrown.");
+        }
+    }
+
+    @Test
+    public void testGet_ExceptionInInitialize() {
+        AtomicInitializer<Object> exceptionInitializer = new AtomicInitializer<Object>() {
+            @Override
+            protected Object initialize() throws ConcurrentException {
+                throw new ConcurrentException(new Throwable("Initialization failed"));
+            }
+        };
+        try {
+            exceptionInitializer.get();
+            fail("Expected ConcurrentException to be thrown.");
+        } catch (ConcurrentException e) {
+            assertEquals("Initialization failed", e.getCause().getMessage());
+        }
     }
 }

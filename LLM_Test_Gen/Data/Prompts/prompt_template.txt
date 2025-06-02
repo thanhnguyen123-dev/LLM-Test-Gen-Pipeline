@@ -49,11 +49,11 @@ Test Generator {
 
         @rule1: A test class is defined as a class that contains test methods for the focal method. It has the following naming format: <ClassName>_<MethodName>_<Param1>_<Param2>_..._Test.java. For example, if the focal method fqn is org.apache.commons.lang3.text.translate.CodePointTranslator.translate(java.lang.CharSequence, int, java.io.Writer), and the signature is int translate(java.lang.CharSequence, int, java.io.Writer), the test class name should be CodePointTranslator_int_translate_CharSequence_int_Writer_Test.java.
         @rule2: Do NOT rewrite or copy-paste the focal method body. Only writes test that calls the focal method.
-        @rule3: Use JUnit 4 and JDK 8 for writing the test cases. Do notimport any thirst-party mocking frameworks. If you really need to observe whether `initialize()` was called, create an anonymous subclass and set a boolean field inside `initialize()`, rather than using a mock/spy.Include all necessary imports. Every test class should have be placed in package org.apache.commons.lang3;
+        @rule3: Use JUnit 4 and JDK 8 for writing the test cases. Do not import any thirst-party mocking frameworks. If you really need to observe whether `initialize()` was called, create an anonymous subclass and set a boolean field inside `initialize()`, rather than using a mock/spy.Include all necessary imports. Every test class should have be placed in package org.apache.commons.lang3;
         @rule4: If it is necessary to test for "throws Exception", use try-catch block to handle the exception, 
             rather than using assertThrows.
         @rule5: Place every test class in package `org.apache.commons.lang3`. That means the first line of the test class should be `package org.apache.commons.lang3;`.
-        @rule6: Use annotations `@RunWith(JUnit4.class)` on the test class and `@Before` for any setup method if necessary. Whether we need the setUp method, refer to @rule8 later for more details. Each test method must have a unique name and be annotated with `@Test`.
+        @rule6: Use `@Before` for any setup method if necessary. Whether we need the setUp method, refer to @rule8 later for more details. Each test method must have a unique name and be annotated with `@Test`.
         @rule7: A test class is allowed to have multiple test methods.
         @rule8: 
             8.1 If `method_modifiers` contains `static`, do not instantiate the class. Instead call the focal method as `ClassName.methodName(args)`. 
@@ -61,7 +61,7 @@ Test Generator {
                 - If `constructor_visibility` is `public` (or `protected`, `package-private` that is effectively accessible), you may instantiate the class as `new ClassName(...)`. Use `class_context` and `class_fields` to determine which constructor signature and arguments to supply.
                 - If `constructor_visibility = "private"`, you CANNOT write any `new ClassName(...)`. Instead, look at `class_factory_methods`, which lists all public static factories returning this class. Use any of these factory methods to instantiate the class that helps testing the focal method.
                 - If `class_factory_methods` is empty, you CANNOT instantiate the class. Simply add a comment to the test class that you cannot instantiate the class because there are no public static factory methods. Then proceed to only test any public static methods.
-            8.3 If `method_modifiers` contains `private static`, you simply cannot invoke the method directly. Just leave a comment to that effect. Therefore, for this situation, you still create a test class, but you do not write any test methods.
+            8.3 If `method_modifiers` contains `private static`, you simply cannot invoke the method directly. Just leave a comment to that effect. Therefore, for this situation, you still create a test class, but you do not write any test methods. Just write a trivial assertEquals(1, 1) method.
         @rule9: The public static `class_factory_methods` you see may be as a list of empty string, or something like this example "foo(int), bar(String, int)", etc. 
             You must use the factory methods to instantiate the class. Pay attention to the parameter types and the number of parameters. For example, the list "foo(int), bar(String, int)" must be comprehended as "foo(int) and bar(String, int)", which is a list of two factory methods.
         @rule10: A successful test suite should cover:

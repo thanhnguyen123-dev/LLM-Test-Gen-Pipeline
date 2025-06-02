@@ -2,34 +2,44 @@ package org.apache.commons.lang3;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
-@RunWith(JUnit4.class)
 public class CharRange_char_getStart_Test {
 
     private CharRange charRange;
 
     @Before
     public void setUp() {
+        // Instantiate CharRange using a factory method since the constructor is private
         charRange = CharRange.is('a');
     }
 
     @Test
-    public void testGetStartTypicalCase() {
+    public void testGetStartWithTypicalRange() {
         assertEquals('a', charRange.getStart());
     }
 
     @Test
-    public void testGetStartEdgeCase() {
-        CharRange edgeCaseRange = CharRange.is('\0');
-        assertEquals('\0', edgeCaseRange.getStart());
+    public void testGetStartWithRangeFromFactoryMethodIsNot() {
+        charRange = CharRange.isNot('z');
+        assertEquals(Character.MIN_VALUE, charRange.getStart());
     }
 
     @Test
-    public void testGetStartBoundaryCase() {
-        CharRange boundaryCaseRange = CharRange.is(Character.MAX_VALUE);
-        assertEquals(Character.MAX_VALUE, boundaryCaseRange.getStart());
+    public void testGetStartWithEdgeCaseMinChar() {
+        charRange = CharRange.is(Character.MIN_VALUE);
+        assertEquals(Character.MIN_VALUE, charRange.getStart());
+    }
+
+    @Test
+    public void testGetStartWithEdgeCaseMaxChar() {
+        charRange = CharRange.is(Character.MAX_VALUE);
+        assertEquals(Character.MAX_VALUE, charRange.getStart());
+    }
+
+    @Test
+    public void testGetStartWithNonNegatedRange() {
+        charRange = CharRange.is('a');
+        assertEquals('a', charRange.getStart());
     }
 }

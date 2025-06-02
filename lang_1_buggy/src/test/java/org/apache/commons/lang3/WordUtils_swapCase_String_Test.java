@@ -2,56 +2,42 @@ package org.apache.commons.lang3;
 
 import org.apache.commons.lang3.text.WordUtils;
 import org.junit.Test;
-import org.junit.Before;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 import static org.junit.Assert.*;
 
-@RunWith(JUnit4.class)
 public class WordUtils_swapCase_String_Test {
 
     @Test
-    public void testSwapCase_withNullInput() {
+    public void testSwapCase_NullInput() {
         assertNull(WordUtils.swapCase(null));
     }
 
     @Test
-    public void testSwapCase_withEmptyString() {
+    public void testSwapCase_EmptyString() {
         assertEquals("", WordUtils.swapCase(""));
     }
 
     @Test
-    public void testSwapCase_withUppercase() {
-        assertEquals("hello", WordUtils.swapCase("HELLO"));
-    }
-
-    @Test
-    public void testSwapCase_withLowercase() {
-        assertEquals("HELLO", WordUtils.swapCase("hello"));
-    }
-
-    @Test
-    public void testSwapCase_withMixedCase() {
+    public void testSwapCase_MixedCase() {
         assertEquals("tHE DOG HAS A bone", WordUtils.swapCase("The dog has a BONE"));
     }
 
     @Test
-    public void testSwapCase_withTitleCaseCharacter() {
-        assertEquals("tHis Is A tEst", WordUtils.swapCase("This is a Test"));
+    public void testSwapCase_UpperCase() {
+        assertEquals("hello WORLD", WordUtils.swapCase("HELLO world"));
     }
 
     @Test
-    public void testSwapCase_withWhitespaceAndLowercase() {
-        assertEquals("Hello World", WordUtils.swapCase("hELLO wORLD"));
+    public void testSwapCase_LowerCase() {
+        assertEquals("HELLO wORLD", WordUtils.swapCase("hello WORLD"));
     }
 
     @Test
-    public void testSwapCase_withNoWhitespace() {
-        assertEquals("jAVA pROGRAM", WordUtils.swapCase("Java Program"));
+    public void testSwapCase_TitleCaseMiddle() {
+        assertEquals("tHis Is a TEST", WordUtils.swapCase("This iS A test"));
     }
 
     @Test
-    public void testSwapCase_withSpecialCharacters() {
-        assertEquals("123 ABC!#", WordUtils.swapCase("123 abc!#"));
+    public void testSwapCase_WhitespaceHandling() {
+        assertEquals("tITLE cASE tEST", WordUtils.swapCase("title CASE Test"));
     }
 }

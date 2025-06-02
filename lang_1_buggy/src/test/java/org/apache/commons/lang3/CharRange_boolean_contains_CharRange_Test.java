@@ -4,28 +4,41 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-@RunWith(JUnit4.class)
 public class CharRange_boolean_contains_CharRange_Test {
 
-    private CharRange range1;
-    private CharRange range2;
+    private CharRange rangeA;
+    private CharRange rangeB;
+    private CharRange rangeC;
+    private CharRange rangeD;
+    private CharRange negatedRange;
 
     @Before
     public void setUp() {
-        range1 = CharRange.is('a');
-        range2 = CharRange.is('b');
+        rangeA = CharRange.is('a');
+        rangeB = CharRange.isIn('a', 'z');
+        rangeC = CharRange.is('z');
+        rangeD = CharRange.isIn('m', 'n');
+        negatedRange = CharRange.isNotIn('m', 'n');
     }
 
     @Test
-    public void testContains_SameRange() {
-        CharRange range = CharRange.is('a');
-        assertTrue(range.contains(range));
+    public void testContainsTypical() {
+        assertTrue(rangeB.contains(rangeA));
+        assertTrue(rangeB.contains(rangeC));
+        assertTrue(rangeB.contains(rangeB));
+        assertFalse(rangeD.contains(rangeA));
     }
 
     @Test
-    public void testContains_NullRange() {
+    public void testContainsNegated() {
+        assertTrue(negatedRange.contains(rangeA));
+        assertFalse(negatedRange.contains(rangeD));
+    }
+
+    @Test
+    public void testContainsNullRange() {
         try {
-            range1.contains(null);
+            rangeA.contains(null);
             fail("Expected IllegalArgumentException");
         } catch (IllegalArgumentException e) {
             assertEquals("The Range must not be null", e.getMessage());
@@ -33,30 +46,9 @@ public class CharRange_boolean_contains_CharRange_Test {
     }
 
     @Test
-    public void testContains_DifferentRanges_NonNegated() {
-        CharRange rangeA = CharRange.isIn('a', 'c');
-        CharRange rangeB = CharRange.is('b');
-        assertTrue(rangeA.contains(rangeB));
-    }
-
-    @Test
-    public void testContains_DifferentRanges_Negated() {
-        CharRange rangeA = CharRange.isNotIn('d', 'f');
-        CharRange rangeB = CharRange.isIn('a', 'z');
-        assertFalse(rangeA.contains(rangeB));
-    }
-
-    @Test
-    public void testContains_BoundaryCondition() {
-        CharRange rangeA = CharRange.is('a');
-        CharRange rangeB = CharRange.is('a');
-        assertTrue(rangeA.contains(rangeB));
-    }
-
-    @Test
-    public void testContains_OutOfRange() {
-        CharRange rangeA = CharRange.is('a');
-        CharRange rangeB = CharRange.is('b');
-        assertFalse(rangeA.contains(rangeB));
+    public void testContainsEdgeCases() {
+        CharRange fullRange = CharRange.isIn('\0', (char) 65535);
+        assertTrue(fullRange.contains(rangeA));
+        assertTrue(fullRange.contains(negatedRange));
     }
 }

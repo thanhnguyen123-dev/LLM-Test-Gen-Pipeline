@@ -2,59 +2,57 @@ package org.apache.commons.lang3;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
 import static org.junit.Assert.*;
 
-@RunWith(JUnit4.class)
 public class CharRange_boolean_equals_Object_Test {
 
-    private CharRange charRangeA;
-    private CharRange charRangeB;
-    private CharRange charRangeC;
+    private CharRange charRange1;
+    private CharRange charRange2;
+    private CharRange charRange3;
 
     @Before
     public void setUp() {
-        charRangeA = CharRange.is('a');
-        charRangeB = CharRange.isIn('a', 'z');
-        charRangeC = CharRange.isNot('a');
+        // Create CharRange instances for testing
+        charRange1 = CharRange.is('a');
+        charRange2 = CharRange.is('a');
+        charRange3 = CharRange.is('b');
     }
 
     @Test
-    public void testEquals_sameObject() {
-        assertTrue(charRangeA.equals(charRangeA));
+    public void testEquals_SameInstance() {
+        assertTrue(charRange1.equals(charRange1));
     }
 
     @Test
-    public void testEquals_equalRanges() {
-        CharRange range = CharRange.is('a');
-        assertTrue(charRangeA.equals(range));
+    public void testEquals_NullObject() {
+        assertFalse(charRange1.equals(null));
     }
 
     @Test
-    public void testEquals_differentStart() {
-        assertFalse(charRangeA.equals(charRangeB));
+    public void testEquals_DifferentClassObject() {
+        assertFalse(charRange1.equals("Some String"));
     }
 
     @Test
-    public void testEquals_differentEnd() {
-        CharRange range = CharRange.isIn('a', 'y');
-        assertFalse(charRangeB.equals(range));
+    public void testEquals_SameValues() {
+        assertTrue(charRange1.equals(charRange2));
     }
 
     @Test
-    public void testEquals_differentNegation() {
-        assertFalse(charRangeA.equals(charRangeC));
+    public void testEquals_DifferentStartValues() {
+        assertFalse(charRange1.equals(charRange3));
     }
 
     @Test
-    public void testEquals_nullObject() {
-        assertFalse(charRangeA.equals(null));
+    public void testEquals_DifferentEndValues() {
+        CharRange charRangeWithDiffEnd = CharRange.isIn('a', 'c');
+        assertFalse(charRange1.equals(charRangeWithDiffEnd));
     }
 
     @Test
-    public void testEquals_differentObjectType() {
-        assertFalse(charRangeA.equals(new Object()));
+    public void testEquals_DifferentNegation() {
+        CharRange negatedCharRange = CharRange.isNot('a');
+        assertFalse(charRange1.equals(negatedCharRange));
     }
 }

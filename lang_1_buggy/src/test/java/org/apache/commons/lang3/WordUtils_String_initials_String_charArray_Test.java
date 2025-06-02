@@ -1,68 +1,60 @@
 package org.apache.commons.lang3;
 
 import org.apache.commons.lang3.text.WordUtils;
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-
 import static org.junit.Assert.*;
 
-@RunWith(JUnit4.class)
 public class WordUtils_String_initials_String_charArray_Test {
 
     @Test
-    public void testNullString() {
-        assertNull(WordUtils.initials(null, new char[]{' '}));
+    public void testInitials_NullString() {
+        assertNull(WordUtils.initials(null, null));
     }
 
     @Test
-    public void testEmptyString() {
-        assertEquals("", WordUtils.initials("", new char[]{' '}));
+    public void testInitials_EmptyString() {
+        assertEquals("", WordUtils.initials("", null));
     }
 
     @Test
-    public void testNullDelimiters() {
+    public void testInitials_NoDelimiters_NullArray() {
         assertEquals("BJL", WordUtils.initials("Ben John Lee", null));
     }
 
     @Test
-    public void testEmptyDelimiters() {
-        assertEquals("", WordUtils.initials("Ben John Lee", new char[0]));
-    }
-
-    @Test
-    public void testWhitespaceDelimiters() {
+    public void testInitials_NoDelimiters_HasPeriods() {
         assertEquals("BJ", WordUtils.initials("Ben J.Lee", null));
     }
 
     @Test
-    public void testDotAndSpaceDelimiters() {
-        assertEquals("BJL", WordUtils.initials("Ben J.Lee", new char[]{' ', '.'}));
+    public void testInitials_WithDelimiters() {
+        assertEquals("BJL", WordUtils.initials("Ben J.Lee", new char[] {' ', '.'}));
     }
 
     @Test
-    public void testSingleCharacterString() {
-        assertEquals("B", WordUtils.initials("B", new char[]{' '}));
+    public void testInitials_EmptyDelimiters() {
+        assertEquals("", WordUtils.initials("Whatever", new char[0]));
     }
 
     @Test
-    public void testStringWithoutDelimiters() {
-        assertEquals("B", WordUtils.initials("Ben", new char[]{' '}));
+    public void testInitials_SingleCharacterString() {
+        assertEquals("A", WordUtils.initials("A", null));
     }
 
     @Test
-    public void testStringWithMultipleConsecutiveDelimiters() {
-        assertEquals("BJL", WordUtils.initials("Ben  J.  Lee", new char[]{' ', '.'}));
+    public void testInitials_DelimitersOnly() {
+        assertEquals("", WordUtils.initials(" . ", new char[] {' ', '.'}));
     }
 
     @Test
-    public void testNonAlphaCharacters() {
-        assertEquals("B1L", WordUtils.initials("Ben1 J@. Lee#2", new char[]{' ', '.', '@', '#', '1', '2'}));
+    public void testInitials_ComplexString() {
+        assertEquals("TQ", WordUtils.initials("The Quick", new char[] {' '}));
     }
 
     @Test
-    public void testStringWithNonAlphabetsOnly() {
-        assertEquals("", WordUtils.initials("!!!", new char[]{'!'}));
+    public void testInitials_BoundaryTest() {
+        assertEquals("A", WordUtils.initials(" A", new char[] {' '}));
     }
+
+    // Add more edge case tests as necessary
 }

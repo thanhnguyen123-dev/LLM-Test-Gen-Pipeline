@@ -388,6 +388,7 @@ public class InfoExtractorRunner {
                     System.out.println("- Literal Constants: " + literalsRaw);
                     System.out.println("- Constructor Visibility: " + constructorVisibility);
                     System.out.println("- Class Factory Methods: " + classFactoryMethods);
+
                     System.out.println("-----------------------------------------------------------------");
                 }
             }

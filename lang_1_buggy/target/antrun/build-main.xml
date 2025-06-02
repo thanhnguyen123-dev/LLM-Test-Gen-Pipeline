@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="maven-antrun-" default="main"  >
+<target name="main">
+  <copy todir="/Users/Admin/IdeaProjects/comp4130/thanh_nguyen_u7594144/lang_1_buggy/target/apidocs/META-INF">
+    <fileset dir="/Users/Admin/IdeaProjects/comp4130/thanh_nguyen_u7594144/lang_1_buggy">
+      <include name="LICENSE.txt"/>
+      <include name="NOTICE.txt"/>
+    </fileset>
+  </copy>
+</target>
+</project>

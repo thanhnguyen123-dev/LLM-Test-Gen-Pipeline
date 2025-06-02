@@ -5,8 +5,7 @@
 @instruction {
     The following Java test case fails to compile. Please correct the code so that it compiles under JDK 8 + JUnit 4.
     - Do not remove existing test assertions, unless they are incorrect and hinders the test from running.
-    - Fix missing imports, missing semicolons, incorrect variable names, mismatched braces, etc.
-    - Assume the SUT (System Under Test) classes are already on the classpath.
+    - Add missing imports, missing semicolons, incorrect variable names, mismatched braces if you identify them. Otherwise, do not change the code.
 }
 
 @format {

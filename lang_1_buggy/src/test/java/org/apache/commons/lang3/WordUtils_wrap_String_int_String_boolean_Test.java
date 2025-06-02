@@ -1,77 +1,70 @@
 package org.apache.commons.lang3;
 
-import org.junit.Test;
-import org.junit.Before;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
-@RunWith(JUnit4.class)
+import org.apache.commons.lang3.text.WordUtils;
+import org.junit.Test;
+
 public class WordUtils_wrap_String_int_String_boolean_Test {
 
     @Test
-    public void testWrap_NullString() {
-        String result = WordUtils.wrap(null, 10, "\n", false);
+    public void testWrap_NullInput() {
+        String result = WordUtils.wrap(null, 10, "\n", true);
         assertNull(result);
     }
 
     @Test
     public void testWrap_EmptyString() {
-        String result = WordUtils.wrap("", 10, "\n", false);
+        String result = WordUtils.wrap("", 10, "\n", true);
         assertEquals("", result);
     }
 
     @Test
-    public void testWrap_SingleWord_NotWrapped() {
-        String result = WordUtils.wrap("hello", 10, "\n", false);
-        assertEquals("hello", result);
+    public void testWrap_LineWrapping() {
+        String result = WordUtils.wrap("The quick brown fox jumps over the lazy dog", 10, "\n", true);
+        assertEquals("The quick\nbrown fox\njumps over\nthe lazy\ndog", result);
     }
 
     @Test
-    public void testWrap_SingleWord_WrappedLongWords() {
-        String result = WordUtils.wrap("hello", 3, "\n", true);
-        assertEquals("hel\nlo", result);
+    public void testWrap_LongWordsWrappingEnabled() {
+        String result = WordUtils.wrap("Jumping", 3, "\n", true);
+        assertEquals("Jum\npin\ng", result);
     }
 
     @Test
-    public void testWrap_MultipleWords_NormalWrap() {
-        String result = WordUtils.wrap("hello world", 5, "\n", false);
-        assertEquals("hello\nworld", result);
+    public void testWrap_LongWordsWrappingDisabled() {
+        String result = WordUtils.wrap("Jumping", 3, "\n", false);
+        assertEquals("Jumping", result);
     }
 
     @Test
-    public void testWrap_NoSpace_WrapLongWords() {
-        String result = WordUtils.wrap("helloworld", 5, "\n", true);
-        assertEquals("hello\nworld", result);
-    }
-
-    @Test
-    public void testWrap_MultipleSpaces() {
-        String result = WordUtils.wrap("hello   world", 5, "\n", false);
-        assertEquals("hello\nworld", result);
-    }
-
-    @Test
-    public void testWrap_VaryingLineLength() {
-        String result = WordUtils.wrap("a long line of text gets wrapped", 7, "\n", false);
-        assertEquals("a long\nline of\ntext\ngets\nwrapped", result);
-    }
-
-    @Test
-    public void testWrap_CustomNewLine() {
-        String result = WordUtils.wrap("hello world", 5, "<br>", false);
-        assertEquals("hello<br>world", result);
+    public void testWrap_NewLineStrNull() {
+        String result = WordUtils.wrap("Word wrap test", 4, null, true);
+        assertEquals("Word\nwrap\ntest", result);
     }
 
     @Test
     public void testWrap_WrapLengthLessThanOne() {
-        String result = WordUtils.wrap("hello world", 0, "\n", false);
-        assertEquals("h\ne\nl\nl\no\n \nw\no\nr\nl\nd", result);
+        String result = WordUtils.wrap("short test", 0, "\n", true);
+        assertEquals("s\nh\no\nr\nt\nt\ne\ns\nt", result);
     }
 
     @Test
-    public void testWrap_WrapLongWordsFalse() {
-        String result = WordUtils.wrap("helloworld", 5, "\n", false);
-        assertEquals("helloworld", result);
+    public void testWrap_Whitespace() {
+        String result = WordUtils.wrap("     ", 2, "\n", false);
+        assertEquals("", result);
+    }
+
+    @Test
+    public void testWrap_LeadingSpaces() {
+        String result = WordUtils.wrap("   leading space", 5, "\n", true);
+        assertEquals("lea\nding\nspace", result);
+    }
+
+    @Test
+    public void testWrap_TrailingSpaces() {
+        String result = WordUtils.wrap("trailing space   ", 8, "\n", true);
+        assertEquals("trailing\nspace", result);
     }
 }

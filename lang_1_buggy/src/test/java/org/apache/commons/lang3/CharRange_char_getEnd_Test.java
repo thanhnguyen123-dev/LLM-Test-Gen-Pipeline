@@ -2,34 +2,33 @@ package org.apache.commons.lang3;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 import static org.junit.Assert.*;
 
-@RunWith(JUnit4.class)
 public class CharRange_char_getEnd_Test {
 
-    private CharRange charRange;
+    private CharRange charRange1;
+    private CharRange charRange2;
 
     @Before
     public void setUp() {
-        charRange = CharRange.is('a'); // Using static factory method to instantiate.
+        // Assuming the existence of a factory method based on given `class_factory_methods`.
+        charRange1 = CharRange.is('a');
+        charRange2 = CharRange.isIn('b', 'z');
     }
 
     @Test
-    public void testTypicalUseCase() {
-        assertEquals('a', charRange.getEnd());
+    public void testGetEnd_typicalRange() {
+        assertEquals('a', charRange1.getEnd());
     }
 
     @Test
-    public void testEdgeCase_EmptyRange() {
-        charRange = CharRange.is('\0'); // Check with zero/null char value
-        assertEquals('\0', charRange.getEnd());
+    public void testGetEnd_differentRange() {
+        assertEquals('z', charRange2.getEnd());
     }
 
     @Test
-    public void testEdgeCase_MaxValue() {
-        charRange = CharRange.is(Character.MAX_VALUE); // Check with max char value
-        assertEquals(Character.MAX_VALUE, charRange.getEnd());
+    public void testGetEnd_edgeCase() {
+        CharRange charRangeEdge = CharRange.is(Character.MAX_VALUE);
+        assertEquals(Character.MAX_VALUE, charRangeEdge.getEnd());
     }
 }

@@ -2,42 +2,57 @@ package org.apache.commons.lang3;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-@RunWith(JUnit4.class)
 public class CharRange_int_hashCode_Test {
 
-    private CharRange range1;
-    private CharRange range2;
-    private CharRange range3;
-    private CharRange range4;
+    private CharRange charRange;
 
     @Before
     public void setUp() {
-        range1 = CharRange.is('a');
-        range2 = CharRange.isNot('b');
-        range3 = CharRange.isIn('c', 'd');
-        range4 = CharRange.isNotIn('e', 'f');
+        // Typical CharRange instance
+        charRange = CharRange.is('a');
     }
 
     @Test
-    public void testHashCode_SameCharRange_ShouldHaveSameHashCode() {
-        CharRange otherRange = CharRange.is('a');
-        assertEquals(range1.hashCode(), otherRange.hashCode());
+    public void testTypicalCase() {
+        CharRange range = CharRange.is('a');
+        int expectedHashCode = 83 + 'a' + 7 * 'a' + 0;
+        assertEquals(expectedHashCode, range.hashCode());
     }
 
     @Test
-    public void testHashCode_DifferentCharRanges_ShouldHaveDifferentHashCodes() {
-        assertNotEquals(range1.hashCode(), range2.hashCode());
-        assertNotEquals(range1.hashCode(), range3.hashCode());
-        assertNotEquals(range2.hashCode(), range3.hashCode());
+    public void testNegatedCase() {
+        CharRange range = CharRange.isNot('a');
+        int expectedHashCode = 83 + 'a' + 7 * 'a' + 1;
+        assertEquals(expectedHashCode, range.hashCode());
     }
 
     @Test
-    public void testHashCode_SameRangeDifferentNegation_ShouldHaveDifferentHashCodes() {
-        CharRange otherRange = CharRange.isNot('a');
-        assertNotEquals(range1.hashCode(), otherRange.hashCode());
+    public void testSingleElementEdgeCase() {
+        CharRange range = CharRange.is('\0');
+        int expectedHashCode = 83 + '\0' + 0 + 7 * '\0';
+        assertEquals(expectedHashCode, range.hashCode());
+    }
+
+    @Test
+    public void testEmptyCase() {
+        CharRange range = CharRange.isIn('\0', '\0');
+        int expectedHashCode = 83 + '\0' + 7 * '\0' + 0;
+        assertEquals(expectedHashCode, range.hashCode());
+    }
+
+    @Test
+    public void testBoundaryCaseEnd() {
+        CharRange range = CharRange.isIn('a', 'z');
+        int expectedHashCode = 83 + 'a' + 7 * 'z' + 0;
+        assertEquals(expectedHashCode, range.hashCode());
+    }
+
+    @Test
+    public void testBoundaryCaseStart() {
+        CharRange range = CharRange.is('z');
+        int expectedHashCode = 83 + 'z' + 7 * 'z' + 0;
+        assertEquals(expectedHashCode, range.hashCode());
     }
 }

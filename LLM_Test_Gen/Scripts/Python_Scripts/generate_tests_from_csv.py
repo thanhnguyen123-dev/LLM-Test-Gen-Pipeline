@@ -185,10 +185,10 @@ if __name__ == "__main__":
                 writer.writerow([fqn, signature, jimple, is_constructor, method_modifiers, annotations, java_doc, class_context, class_fields, loop_count, branch_count, external_dependencies, literal_constants, constructor_visibility, class_factory_methods, generated_code])
                 processed_count += 1
 
-                # Add delay between API calls to avoid rate limits
-                if processed_count < len(methods_to_process):
-                    print(f"  -> Waiting for {API_CALL_DELAY} second(s)...")
-                    time.sleep(API_CALL_DELAY)
+                # # Add delay between API calls to avoid rate limits
+                # if processed_count < len(methods_to_process):
+                #     print(f"  -> Waiting for {API_CALL_DELAY} second(s)...")
+                #     time.sleep(API_CALL_DELAY)
 
     except Exception as e:
         print(f"\nFATAL ERROR: An error occurred during test generation or writing to output CSV '{output_csv_path}': {e}")
