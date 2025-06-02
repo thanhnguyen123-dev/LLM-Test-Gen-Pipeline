@@ -4,6 +4,7 @@ import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.ast.body.CallableDeclaration;
 import com.github.javaparser.ast.body.ConstructorDeclaration;
+import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
 import sootup.core.Project;
 import sootup.core.inputlocation.AnalysisInputLocation;
@@ -63,7 +64,8 @@ public class InfoExtractorRunner {
             "Branch Count",
             "External Dependencies",
             "Literal Constants",
-            "Constructor Visibility"
+            "Constructor Visibility",
+            "Class Factory Methods"
     };
 
     private static final String CSV_HEADER = InfoExtractorRunner.getCsvHeader();
@@ -334,6 +336,19 @@ public class InfoExtractorRunner {
                             .collect(Collectors.joining(", "));
 
                     // Extract class factory method
+                    List<MethodDeclaration> allMethods = classOrInterfaceDeclaration.getMethods();
+                    List<String> factoryList = allMethods.stream()
+                            .filter(m -> m.isPublic() && m.isStatic() && m.getType().asString().equals(classOrInterfaceDeclaration.getNameAsString()))
+                            .map(m -> {
+                                String currentMethodName = m.getNameAsString();
+                                String paramList = m.getParameters().stream()
+                                        .map(param -> param.getType().asString())
+                                        .collect(Collectors.joining(","));
+                                return currentMethodName + "(" + paramList + ")";
+                            })
+                            .collect(Collectors.toList());
+                    String classFactoryMethods = String.join(", ", factoryList);
+
 
                     // Construct a CSV line
                     String csvLine = String.join(
@@ -351,8 +366,8 @@ public class InfoExtractorRunner {
                             quoteField(String.valueOf(branchCount)),
                             quoteField(externalCallsRaw),
                             quoteField(literalsRaw),
-                            quoteField(constructorVisibility)
-
+                            quoteField(constructorVisibility),
+                            quoteField(classFactoryMethods)
                     );
                     writer.println(csvLine);
 
@@ -372,6 +387,7 @@ public class InfoExtractorRunner {
                     System.out.println("- External Dependencies: " + externalCallsRaw);
                     System.out.println("- Literal Constants: " + literalsRaw);
                     System.out.println("- Constructor Visibility: " + constructorVisibility);
+                    System.out.println("- Class Factory Methods: " + classFactoryMethods);
                     System.out.println("-----------------------------------------------------------------");
                 }
             }

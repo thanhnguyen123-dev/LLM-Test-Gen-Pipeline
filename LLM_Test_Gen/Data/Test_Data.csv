@@ -1,41 +1,848 @@
-"FQN","Signature","Jimple Code Representation","Is Constructor","Method Modifiers","Annotations","Java Doc","Class Context","Class Fields","Loop Count","Branch Count","External Dependencies","Literal Constants","Constructor Visibility"
-"org.apache.commons.lang3.text.translate.CodePointTranslator.translate(java.lang.CharSequence, int, java.io.Writer)","int translate(java.lang.CharSequence, int, java.io.Writer)","{
-    int index;
-    java.io.Writer out;
-    java.lang.CharSequence input;
-    org.apache.commons.lang3.text.translate.CodePointTranslator this;
-    unknown codepoint, consumed;
+"FQN","Signature","Jimple Code Representation","Is Constructor","Method Modifiers","Annotations","Java Doc","Class Context","Class Fields","Loop Count","Branch Count","External Dependencies","Literal Constants","Constructor Visibility","Class Factory Methods"
+"org.apache.commons.lang3.CharSetUtils.delete(java.lang.String, java.lang.String[])","java.lang.String delete(java.lang.String, java.lang.String[])","{
+    java.lang.String str;
+    java.lang.String[] set;
+    unknown $stack2, $stack3, $stack4, $stack5;
 
 
-    this := @this: org.apache.commons.lang3.text.translate.CodePointTranslator;
-    input := @parameter0: java.lang.CharSequence;
-    index := @parameter1: int;
-    out := @parameter2: java.io.Writer;
-    codepoint = staticinvoke <java.lang.Character: int codePointAt(java.lang.CharSequence,int)>(input, index);
-    consumed = virtualinvoke this.<org.apache.commons.lang3.text.translate.CodePointTranslator: boolean translate(int,java.io.Writer)>(codepoint, out);
+    str := @parameter0: java.lang.String;
+    set := @parameter1: java.lang.String[];
+    $stack2 = staticinvoke <org.apache.commons.lang3.StringUtils: boolean isEmpty(java.lang.CharSequence)>(str);
 
-    if consumed == 0 goto label1;
+    if $stack2 != 0 goto label1;
+    $stack3 = staticinvoke <org.apache.commons.lang3.CharSetUtils: boolean deepEmpty(java.lang.String[])>(set);
+
+    if $stack3 == 0 goto label2;
+
+  label1:
+    $stack5 = str;
+
+    return $stack5;
+
+  label2:
+    $stack4 = staticinvoke <org.apache.commons.lang3.CharSetUtils: java.lang.String modify(java.lang.String,java.lang.String[],boolean)>(str, set, 0);
+
+    return $stack4;
+}
+","false","PUBLIC STATIC TRANSIENT","","<p>Takes an argument in set-syntax, see evaluateSet,
+and deletes any of characters present in the specified string.</p>
+
+<pre>
+CharSetUtils.delete(null, *)        = null
+CharSetUtils.delete("""", *)          = """"
+CharSetUtils.delete(*, null)        = *
+CharSetUtils.delete(*, """")          = *
+CharSetUtils.delete(""hello"", ""hl"")  = ""eo""
+CharSetUtils.delete(""hello"", ""le"")  = ""ho""
+</pre>
+@see CharSet#getInstance(java.lang.String...) for set-syntax.
+@param str String to delete characters from, may be null
+@param set String[] set of characters to delete, may be null
+@return the modified String, {@code null} if null string input","","","0","1","org.apache.commons.lang3.StringUtils.isEmpty(java.lang.CharSequence), org.apache.commons.lang3.CharSetUtils.deepEmpty(java.lang.String[]), org.apache.commons.lang3.CharSetUtils.modify(java.lang.String, java.lang.String[], boolean)","false","public",""
+"org.apache.commons.lang3.CharSetUtils.CharSetUtils()","void CharSetUtils()","{
+    org.apache.commons.lang3.CharSetUtils this;
+
+
+    this := @this: org.apache.commons.lang3.CharSetUtils;
+    specialinvoke this.<java.lang.Object: void <init>()>();
+
+    return;
+}
+","true","PUBLIC","","<p>CharSetUtils instances should NOT be constructed in standard programming.
+Instead, the class should be used as {@code CharSetUtils.evaluateSet(null);}.</p>
+
+<p>This constructor is public to permit tools that require a JavaBean instance
+to operate.</p>","","","0","0","","","public",""
+"org.apache.commons.lang3.CharSetUtils.modify(java.lang.String, java.lang.String[], boolean)","java.lang.String modify(java.lang.String, java.lang.String[], boolean)","{
+    boolean expect;
+    java.lang.String str;
+    java.lang.String[] set;
+    unknown $stack10, $stack11, $stack12, $stack13, $stack14, $stack15, $stack16, $stack8, $stack9, buffer, chars, chrs, i, sz;
+
+
+    str := @parameter0: java.lang.String;
+    set := @parameter1: java.lang.String[];
+    expect := @parameter2: boolean;
+    chars = staticinvoke <org.apache.commons.lang3.CharSet: org.apache.commons.lang3.CharSet getInstance(java.lang.String[])>(set);
+    $stack8 = new java.lang.StringBuilder;
+    $stack9 = virtualinvoke str.<java.lang.String: int length()>();
+    specialinvoke $stack8.<java.lang.StringBuilder: void <init>(int)>($stack9);
+    buffer = $stack8;
+    chrs = virtualinvoke str.<java.lang.String: char[] toCharArray()>();
+    sz = lengthof chrs;
+    i = 0;
+
+    goto label3;
+
+  label1:
+    $stack10 = chrs[i];
+    $stack11 = virtualinvoke chars.<org.apache.commons.lang3.CharSet: boolean contains(char)>($stack10);
+
+    if $stack11 != expect goto label2;
+    $stack14 = chrs[i];
+    $stack15 = virtualinvoke buffer.<java.lang.StringBuilder: java.lang.StringBuilder append(char)>($stack14);
+
+  label2:
+    i = i + 1;
+
+  label3:
+    $stack13 = i;
+    $stack12 = sz;
+
+    if $stack13 < $stack12 goto label1;
+    $stack16 = virtualinvoke buffer.<java.lang.StringBuilder: java.lang.String toString()>();
+
+    return $stack16;
+}
+","false","PRIVATE STATIC","","Implementation of delete and keep
+@param str String to modify characters within
+@param set String[] set of characters to modify
+@param expect whether to evaluate on match, or non-match
+@return the modified String, not null","","","1","1","org.apache.commons.lang3.CharSet.getInstance(java.lang.String...), java.lang.String.length(), java.lang.String.toCharArray(), org.apache.commons.lang3.CharSet.contains(char), java.lang.StringBuilder.append(char), java.lang.StringBuilder.toString()","0","public",""
+"org.apache.commons.lang3.CharSetUtils.keep(java.lang.String, java.lang.String[])","java.lang.String keep(java.lang.String, java.lang.String[])","{
+    java.lang.String str;
+    java.lang.String[] set;
+    unknown $stack2, $stack3, $stack4, $stack5;
+
+
+    str := @parameter0: java.lang.String;
+    set := @parameter1: java.lang.String[];
+
+    if str != null goto label1;
+
+    return null;
+
+  label1:
+    $stack2 = virtualinvoke str.<java.lang.String: boolean isEmpty()>();
+
+    if $stack2 != 0 goto label2;
+    $stack3 = staticinvoke <org.apache.commons.lang3.CharSetUtils: boolean deepEmpty(java.lang.String[])>(set);
+
+    if $stack3 == 0 goto label3;
+
+  label2:
+    $stack5 = """";
+
+    return $stack5;
+
+  label3:
+    $stack4 = staticinvoke <org.apache.commons.lang3.CharSetUtils: java.lang.String modify(java.lang.String,java.lang.String[],boolean)>(str, set, 1);
+
+    return $stack4;
+}
+","false","PUBLIC STATIC TRANSIENT","","<p>Takes an argument in set-syntax, see evaluateSet,
+and keeps any of characters present in the specified string.</p>
+
+<pre>
+CharSetUtils.keep(null, *)        = null
+CharSetUtils.keep("""", *)          = """"
+CharSetUtils.keep(*, null)        = """"
+CharSetUtils.keep(*, """")          = """"
+CharSetUtils.keep(""hello"", ""hl"")  = ""hll""
+CharSetUtils.keep(""hello"", ""le"")  = ""ell""
+</pre>
+@see CharSet#getInstance(java.lang.String...) for set-syntax.
+@param str String to keep characters from, may be null
+@param set String[] set of characters to keep, may be null
+@return the modified String, {@code null} if null string input
+@since 2.0","","","0","2","java.lang.String.isEmpty(), org.apache.commons.lang3.CharSetUtils.deepEmpty(java.lang.String[]), org.apache.commons.lang3.CharSetUtils.modify(java.lang.String, java.lang.String[], boolean)","true","public",""
+"org.apache.commons.lang3.CharSetUtils.containsAny(java.lang.String, java.lang.String[])","boolean containsAny(java.lang.String, java.lang.String[])","{
+    java.lang.String str;
+    java.lang.String[] set;
+    unknown $stack10, $stack11, $stack12, $stack13, $stack7, $stack8, $stack9, c, chars, l4, l5, l6;
+
+
+    str := @parameter0: java.lang.String;
+    set := @parameter1: java.lang.String[];
+    $stack7 = staticinvoke <org.apache.commons.lang3.StringUtils: boolean isEmpty(java.lang.CharSequence)>(str);
+
+    if $stack7 != 0 goto label1;
+    $stack8 = staticinvoke <org.apache.commons.lang3.CharSetUtils: boolean deepEmpty(java.lang.String[])>(set);
+
+    if $stack8 == 0 goto label2;
+
+  label1:
+    $stack13 = 0;
+
+    return $stack13;
+
+  label2:
+    chars = staticinvoke <org.apache.commons.lang3.CharSet: org.apache.commons.lang3.CharSet getInstance(java.lang.String[])>(set);
+    $stack9 = virtualinvoke str.<java.lang.String: char[] toCharArray()>();
+    l6 = $stack9;
+    l5 = lengthof $stack9;
+    l4 = 0;
+
+    goto label4;
+
+  label3:
+    l4 = l4 + 1;
+
+  label4:
+    $stack12 = l4;
+    $stack11 = l5;
+
+    if $stack12 < $stack11 goto label5;
+
+    return 0;
+
+  label5:
+    c = l6[l4];
+    $stack10 = virtualinvoke chars.<org.apache.commons.lang3.CharSet: boolean contains(char)>(c);
+
+    if $stack10 == 0 goto label3;
+
+    return 1;
+}
+","false","PUBLIC STATIC TRANSIENT","","<p>Takes an argument in set-syntax, see evaluateSet,
+and identifies whether any of the characters are present in the specified string.</p>
+
+<pre>
+CharSetUtils.containsAny(null, *)        = false
+CharSetUtils.containsAny("""", *)          = false
+CharSetUtils.containsAny(*, null)        = false
+CharSetUtils.containsAny(*, """")          = false
+CharSetUtils.containsAny(""hello"", ""k-p"") = true
+CharSetUtils.containsAny(""hello"", ""a-d"") = false
+</pre>
+@see CharSet#getInstance(java.lang.String...) for set-syntax.
+@param str String to look for characters in, may be null
+@param set String[] set of characters to identify, may be null
+@return whether or not the characters in the set are in the primary string","","","0","2","org.apache.commons.lang3.StringUtils.isEmpty(java.lang.CharSequence), org.apache.commons.lang3.CharSetUtils.deepEmpty(java.lang.String[]), org.apache.commons.lang3.CharSet.getInstance(java.lang.String...), java.lang.String.toCharArray(), org.apache.commons.lang3.CharSet.contains(char)","false, true","public",""
+"org.apache.commons.lang3.CharSetUtils.squeeze(java.lang.String, java.lang.String[])","java.lang.String squeeze(java.lang.String, java.lang.String[])","{
+    java.lang.String str;
+    java.lang.String[] set;
+    unknown $stack10, $stack11, $stack12, $stack13, $stack14, $stack15, $stack16, $stack17, $stack18, $stack19, $stack20, $stack21, $stack9, buffer, ch, chars, chrs, i, lastChar, sz;
+
+
+    str := @parameter0: java.lang.String;
+    set := @parameter1: java.lang.String[];
+    $stack9 = staticinvoke <org.apache.commons.lang3.StringUtils: boolean isEmpty(java.lang.CharSequence)>(str);
+
+    if $stack9 != 0 goto label1;
+    $stack10 = staticinvoke <org.apache.commons.lang3.CharSetUtils: boolean deepEmpty(java.lang.String[])>(set);
+
+    if $stack10 == 0 goto label2;
+
+  label1:
+    $stack21 = str;
+
+    return $stack21;
+
+  label2:
+    chars = staticinvoke <org.apache.commons.lang3.CharSet: org.apache.commons.lang3.CharSet getInstance(java.lang.String[])>(set);
+    $stack11 = new java.lang.StringBuilder;
+    $stack12 = virtualinvoke str.<java.lang.String: int length()>();
+    specialinvoke $stack11.<java.lang.StringBuilder: void <init>(int)>($stack12);
+    buffer = $stack11;
+    chrs = virtualinvoke str.<java.lang.String: char[] toCharArray()>();
+    sz = lengthof chrs;
+    lastChar = 32;
+    ch = 32;
+    i = 0;
+
+    goto label5;
+
+  label3:
+    $stack17 = buffer;
+    $stack16 = ch;
+    $stack13 = virtualinvoke $stack17.<java.lang.StringBuilder: java.lang.StringBuilder append(char)>($stack16);
+    $stack18 = ch;
+    lastChar = $stack18;
+
+  label4:
+    i = i + 1;
+
+  label5:
+    $stack15 = i;
+    $stack14 = sz;
+
+    if $stack15 < $stack14 goto label6;
+    $stack20 = virtualinvoke buffer.<java.lang.StringBuilder: java.lang.String toString()>();
+
+    return $stack20;
+
+  label6:
+    ch = chrs[i];
+
+    if ch != lastChar goto label3;
+
+    if i == 0 goto label3;
+    $stack19 = virtualinvoke chars.<org.apache.commons.lang3.CharSet: boolean contains(char)>(ch);
+
+    if $stack19 == 0 goto label3;
+
+    goto label4;
+}
+","false","PUBLIC STATIC TRANSIENT","","<p>Squeezes any repetitions of a character that is mentioned in the
+supplied set.</p>
+
+<pre>
+CharSetUtils.squeeze(null, *)        = null
+CharSetUtils.squeeze("""", *)          = """"
+CharSetUtils.squeeze(*, null)        = *
+CharSetUtils.squeeze(*, """")          = *
+CharSetUtils.squeeze(""hello"", ""k-p"") = ""helo""
+CharSetUtils.squeeze(""hello"", ""a-e"") = ""hello""
+</pre>
+@see CharSet#getInstance(java.lang.String...) for set-syntax.
+@param str the string to squeeze, may be null
+@param set the character set to use for manipulation, may be null
+@return the modified String, {@code null} if null string input","","","1","2","org.apache.commons.lang3.StringUtils.isEmpty(java.lang.CharSequence), org.apache.commons.lang3.CharSetUtils.deepEmpty(java.lang.String[]), org.apache.commons.lang3.CharSet.getInstance(java.lang.String...), java.lang.String.length(), java.lang.String.toCharArray(), org.apache.commons.lang3.CharSet.contains(char), java.lang.StringBuilder.append(char), java.lang.StringBuilder.toString()","' ', 0","public",""
+"org.apache.commons.lang3.CharSetUtils.deepEmpty(java.lang.String[])","boolean deepEmpty(java.lang.String[])","{
+    java.lang.String[] strings;
+    unknown $stack5, $stack6, $stack7, $stack8, l2, l3, l4, s;
+
+
+    strings := @parameter0: java.lang.String[];
+
+    if strings == null goto label3;
+    l4 = strings;
+    l3 = lengthof strings;
+    l2 = 0;
+
+    goto label2;
+
+  label1:
+    l2 = l2 + 1;
+
+  label2:
+    $stack7 = l2;
+    $stack6 = l3;
+
+    if $stack7 < $stack6 goto label4;
+
+  label3:
+    $stack8 = 1;
+
+    return $stack8;
+
+  label4:
+    s = l4[l2];
+    $stack5 = staticinvoke <org.apache.commons.lang3.StringUtils: boolean isNotEmpty(java.lang.CharSequence)>(s);
+
+    if $stack5 == 0 goto label1;
+
+    return 0;
+}
+","false","PRIVATE STATIC","","Determines whether or not all the Strings in an array are 
+empty or not.
+@param strings String[] whose elements are being checked for emptiness
+@return whether or not the String is empty","","","0","2","org.apache.commons.lang3.StringUtils.isNotEmpty(java.lang.CharSequence)","false, true","public",""
+"org.apache.commons.lang3.CharSetUtils.count(java.lang.String, java.lang.String[])","int count(java.lang.String, java.lang.String[])","{
+    java.lang.String str;
+    java.lang.String[] set;
+    unknown $stack10, $stack11, $stack12, $stack13, $stack14, $stack8, $stack9, c, chars, count, l5, l6, l7;
+
+
+    str := @parameter0: java.lang.String;
+    set := @parameter1: java.lang.String[];
+    $stack8 = staticinvoke <org.apache.commons.lang3.StringUtils: boolean isEmpty(java.lang.CharSequence)>(str);
+
+    if $stack8 != 0 goto label1;
+    $stack9 = staticinvoke <org.apache.commons.lang3.CharSetUtils: boolean deepEmpty(java.lang.String[])>(set);
+
+    if $stack9 == 0 goto label2;
+
+  label1:
+    $stack14 = 0;
+
+    return $stack14;
+
+  label2:
+    chars = staticinvoke <org.apache.commons.lang3.CharSet: org.apache.commons.lang3.CharSet getInstance(java.lang.String[])>(set);
+    count = 0;
+    $stack10 = virtualinvoke str.<java.lang.String: char[] toCharArray()>();
+    l7 = $stack10;
+    l6 = lengthof $stack10;
+    l5 = 0;
+
+    goto label5;
+
+  label3:
+    c = l7[l5];
+    $stack11 = virtualinvoke chars.<org.apache.commons.lang3.CharSet: boolean contains(char)>(c);
+
+    if $stack11 == 0 goto label4;
+    count = count + 1;
+
+  label4:
+    l5 = l5 + 1;
+
+  label5:
+    $stack13 = l5;
+    $stack12 = l6;
+
+    if $stack13 < $stack12 goto label3;
+
+    return count;
+}
+","false","PUBLIC STATIC TRANSIENT","","<p>Takes an argument in set-syntax, see evaluateSet,
+and returns the number of characters present in the specified string.</p>
+
+<pre>
+CharSetUtils.count(null, *)        = 0
+CharSetUtils.count("""", *)          = 0
+CharSetUtils.count(*, null)        = 0
+CharSetUtils.count(*, """")          = 0
+CharSetUtils.count(""hello"", ""k-p"") = 3
+CharSetUtils.count(""hello"", ""a-e"") = 1
+</pre>
+@see CharSet#getInstance(java.lang.String...) for set-syntax.
+@param str String to count characters in, may be null
+@param set String[] set of characters to count, may be null
+@return the character count, zero if null string input","","","0","2","org.apache.commons.lang3.StringUtils.isEmpty(java.lang.CharSequence), org.apache.commons.lang3.CharSetUtils.deepEmpty(java.lang.String[]), org.apache.commons.lang3.CharSet.getInstance(java.lang.String...), java.lang.String.toCharArray(), org.apache.commons.lang3.CharSet.contains(char)","0","public",""
+"org.apache.commons.lang3.concurrent.AtomicInitializer.get()","java.lang.Object get()","{
+    org.apache.commons.lang3.concurrent.AtomicInitializer this;
+    unknown $stack2, $stack3, $stack4, $stack5, $stack6, result;
+
+
+    this := @this: org.apache.commons.lang3.concurrent.AtomicInitializer;
+    $stack2 = this.<org.apache.commons.lang3.concurrent.AtomicInitializer: java.util.concurrent.atomic.AtomicReference reference>;
+    result = virtualinvoke $stack2.<java.util.concurrent.atomic.AtomicReference: java.lang.Object get()>();
+
+    if result != null goto label1;
+    result = virtualinvoke this.<org.apache.commons.lang3.concurrent.AtomicInitializer: java.lang.Object initialize()>();
+    $stack3 = this.<org.apache.commons.lang3.concurrent.AtomicInitializer: java.util.concurrent.atomic.AtomicReference reference>;
+    $stack4 = virtualinvoke $stack3.<java.util.concurrent.atomic.AtomicReference: boolean compareAndSet(java.lang.Object,java.lang.Object)>(null, result);
+
+    if $stack4 != 0 goto label1;
+    $stack6 = this.<org.apache.commons.lang3.concurrent.AtomicInitializer: java.util.concurrent.atomic.AtomicReference reference>;
+    result = virtualinvoke $stack6.<java.util.concurrent.atomic.AtomicReference: java.lang.Object get()>();
+
+  label1:
+    $stack5 = result;
+
+    return $stack5;
+}
+","false","PUBLIC","Override","Returns the object managed by this initializer. The object is created if
+it is not available yet and stored internally. This method always returns
+the same object.
+@return the object created by this {@code AtomicInitializer}
+@throws ConcurrentException if an error occurred during initialization of
+the object","implements org.apache.commons.lang3.concurrent.ConcurrentInitializer","PRIVATE FINAL java.util.concurrent.atomic.AtomicReference reference","0","2","java.util.concurrent.atomic.AtomicReference.get(), org.apache.commons.lang3.concurrent.AtomicInitializer.initialize(), java.util.concurrent.atomic.AtomicReference.compareAndSet(V, V)","","public",""
+"org.apache.commons.lang3.CharRange.getStart()","char getStart()","{
+    org.apache.commons.lang3.CharRange this;
+    unknown $stack1;
+
+
+    this := @this: org.apache.commons.lang3.CharRange;
+    $stack1 = this.<org.apache.commons.lang3.CharRange: char start>;
+
+    return $stack1;
+}
+","false","PUBLIC","","<p>Gets the start character for this character range.</p>
+@return the start char (inclusive)","implements java.io.Serializable, java.lang.Iterable","PRIVATE TRANSIENT java.lang.String iToString; PRIVATE FINAL char end; PRIVATE FINAL char start; PRIVATE FINAL boolean negated; PRIVATE STATIC FINAL long serialVersionUID","0","0","","","private","is(char), isNot(char), isIn(char,char), isNotIn(char,char)"
+"org.apache.commons.lang3.CharRange.getEnd()","char getEnd()","{
+    org.apache.commons.lang3.CharRange this;
+    unknown $stack1;
+
+
+    this := @this: org.apache.commons.lang3.CharRange;
+    $stack1 = this.<org.apache.commons.lang3.CharRange: char end>;
+
+    return $stack1;
+}
+","false","PUBLIC","","<p>Gets the end character for this character range.</p>
+@return the end char (inclusive)","implements java.io.Serializable, java.lang.Iterable","PRIVATE TRANSIENT java.lang.String iToString; PRIVATE FINAL char end; PRIVATE FINAL char start; PRIVATE FINAL boolean negated; PRIVATE STATIC FINAL long serialVersionUID","0","0","","","private","is(char), isNot(char), isIn(char,char), isNotIn(char,char)"
+"org.apache.commons.lang3.CharRange.hashCode()","int hashCode()","{
+    org.apache.commons.lang3.CharRange this;
+    unknown $stack1, $stack2, $stack3, $stack4, $stack5, $stack6, $stack7, $stack8;
+
+
+    this := @this: org.apache.commons.lang3.CharRange;
+    $stack1 = this.<org.apache.commons.lang3.CharRange: char start>;
+    $stack4 = 83 + $stack1;
+    $stack2 = this.<org.apache.commons.lang3.CharRange: char end>;
+    $stack3 = 7 * $stack2;
+    $stack6 = $stack4 + $stack3;
+    $stack5 = this.<org.apache.commons.lang3.CharRange: boolean negated>;
+
+    if $stack5 == 0 goto label1;
+    $stack8 = 1;
+
+    goto label2;
+
+  label1:
+    $stack8 = 0;
+
+  label2:
+    $stack7 = $stack6 + $stack8;
+
+    return $stack7;
+}
+","false","PUBLIC","Override","<p>Gets a hashCode compatible with the equals method.</p>
+@return a suitable hashCode","implements java.io.Serializable, java.lang.Iterable","PRIVATE TRANSIENT java.lang.String iToString; PRIVATE FINAL char end; PRIVATE FINAL char start; PRIVATE FINAL boolean negated; PRIVATE STATIC FINAL long serialVersionUID","0","0","","83, 7, 1, 0","private","is(char), isNot(char), isIn(char,char), isNotIn(char,char)"
+"org.apache.commons.lang3.CharRange.is(char)","org.apache.commons.lang3.CharRange is(char)","{
+    char ch;
+    unknown $stack1;
+
+
+    ch := @parameter0: char;
+    $stack1 = new org.apache.commons.lang3.CharRange;
+    specialinvoke $stack1.<org.apache.commons.lang3.CharRange: void <init>(char,char,boolean)>(ch, ch, 0);
+
+    return $stack1;
+}
+","false","PUBLIC STATIC","","<p>Constructs a {@code CharRange} over a single character.</p>
+@param ch only character in this range
+@return the new CharRange object
+@see CharRange#CharRange(char, char, boolean)
+@since 2.5","implements java.io.Serializable, java.lang.Iterable","PRIVATE TRANSIENT java.lang.String iToString; PRIVATE FINAL char end; PRIVATE FINAL char start; PRIVATE FINAL boolean negated; PRIVATE STATIC FINAL long serialVersionUID","0","0","","false","private","is(char), isNot(char), isIn(char,char), isNotIn(char,char)"
+"org.apache.commons.lang3.CharRange.contains(char)","boolean contains(char)","{
+    char ch;
+    org.apache.commons.lang3.CharRange this;
+    unknown $stack2, $stack3, $stack4, $stack5, $stack6, $stack7;
+
+
+    this := @this: org.apache.commons.lang3.CharRange;
+    ch := @parameter0: char;
+    $stack2 = this.<org.apache.commons.lang3.CharRange: char start>;
+
+    if ch < $stack2 goto label1;
+    $stack5 = this.<org.apache.commons.lang3.CharRange: char end>;
+
+    if ch > $stack5 goto label1;
+    $stack7 = 1;
+
+    goto label2;
+
+  label1:
+    $stack7 = 0;
+
+  label2:
+    $stack6 = this;
+    $stack3 = this.<org.apache.commons.lang3.CharRange: boolean negated>;
+    $stack4 = $stack7 ^ $stack3;
+
+    return $stack4;
+}
+","false","PUBLIC","","<p>Is the character specified contained in this range.</p>
+@param ch the character to check
+@return {@code true} if this range contains the input character","implements java.io.Serializable, java.lang.Iterable","PRIVATE TRANSIENT java.lang.String iToString; PRIVATE FINAL char end; PRIVATE FINAL char start; PRIVATE FINAL boolean negated; PRIVATE STATIC FINAL long serialVersionUID","0","0","","","private","is(char), isNot(char), isIn(char,char), isNotIn(char,char)"
+"org.apache.commons.lang3.CharRange.equals(java.lang.Object)","boolean equals(java.lang.Object)","{
+    java.lang.Object obj;
+    org.apache.commons.lang3.CharRange this;
+    unknown $stack10, $stack3, $stack4, $stack5, $stack6, $stack7, $stack8, $stack9, other;
+
+
+    this := @this: org.apache.commons.lang3.CharRange;
+    obj := @parameter0: java.lang.Object;
+
+    if obj != this goto label1;
 
     return 1;
 
   label1:
+    $stack3 = obj instanceof org.apache.commons.lang3.CharRange;
+
+    if $stack3 != 0 goto label2;
+
     return 0;
+
+  label2:
+    other = (org.apache.commons.lang3.CharRange) obj;
+    $stack5 = this.<org.apache.commons.lang3.CharRange: char start>;
+    $stack4 = other.<org.apache.commons.lang3.CharRange: char start>;
+
+    if $stack5 != $stack4 goto label3;
+    $stack7 = this.<org.apache.commons.lang3.CharRange: char end>;
+    $stack6 = other.<org.apache.commons.lang3.CharRange: char end>;
+
+    if $stack7 != $stack6 goto label3;
+    $stack10 = this.<org.apache.commons.lang3.CharRange: boolean negated>;
+    $stack9 = other.<org.apache.commons.lang3.CharRange: boolean negated>;
+
+    if $stack10 != $stack9 goto label3;
+
+    return 1;
+
+  label3:
+    $stack8 = 0;
+
+    return $stack8;
 }
-","false","PUBLIC FINAL","Override","Implementation of translate that maps onto the abstract translate(int, Writer) method. 
-{@inheritDoc}","org.apache.commons.lang3.text.translate.CharSequenceTranslator","","0","1","java.lang.Character.codePointAt(java.lang.CharSequence, int), org.apache.commons.lang3.text.translate.CodePointTranslator.translate(int, java.io.Writer)","1, 0","public"
-"org.apache.commons.lang3.text.WordUtils.capitalizeFully(java.lang.String)","java.lang.String capitalizeFully(java.lang.String)","{
+","false","PUBLIC","Override","<p>Compares two CharRange objects, returning true if they represent
+exactly the same range of characters defined in the same way.</p>
+@param obj the object to compare to
+@return true if equal","implements java.io.Serializable, java.lang.Iterable","PRIVATE TRANSIENT java.lang.String iToString; PRIVATE FINAL char end; PRIVATE FINAL char start; PRIVATE FINAL boolean negated; PRIVATE STATIC FINAL long serialVersionUID","0","2","","true, false","private","is(char), isNot(char), isIn(char,char), isNotIn(char,char)"
+"org.apache.commons.lang3.CharRange.isNot(char)","org.apache.commons.lang3.CharRange isNot(char)","{
+    char ch;
+    unknown $stack1;
+
+
+    ch := @parameter0: char;
+    $stack1 = new org.apache.commons.lang3.CharRange;
+    specialinvoke $stack1.<org.apache.commons.lang3.CharRange: void <init>(char,char,boolean)>(ch, ch, 1);
+
+    return $stack1;
+}
+","false","PUBLIC STATIC","","<p>Constructs a negated {@code CharRange} over a single character.</p>
+@param ch only character in this range
+@return the new CharRange object
+@see CharRange#CharRange(char, char, boolean)
+@since 2.5","implements java.io.Serializable, java.lang.Iterable","PRIVATE TRANSIENT java.lang.String iToString; PRIVATE FINAL char end; PRIVATE FINAL char start; PRIVATE FINAL boolean negated; PRIVATE STATIC FINAL long serialVersionUID","0","0","","true","private","is(char), isNot(char), isIn(char,char), isNotIn(char,char)"
+"org.apache.commons.lang3.CharRange.isIn(char, char)","org.apache.commons.lang3.CharRange isIn(char, char)","{
+    char end, start;
+    unknown $stack2;
+
+
+    start := @parameter0: char;
+    end := @parameter1: char;
+    $stack2 = new org.apache.commons.lang3.CharRange;
+    specialinvoke $stack2.<org.apache.commons.lang3.CharRange: void <init>(char,char,boolean)>(start, end, 0);
+
+    return $stack2;
+}
+","false","PUBLIC STATIC","","<p>Constructs a {@code CharRange} over a set of characters.</p>
+@param start first character, inclusive, in this range
+@param end last character, inclusive, in this range
+@return the new CharRange object
+@see CharRange#CharRange(char, char, boolean)
+@since 2.5","implements java.io.Serializable, java.lang.Iterable","PRIVATE TRANSIENT java.lang.String iToString; PRIVATE FINAL char end; PRIVATE FINAL char start; PRIVATE FINAL boolean negated; PRIVATE STATIC FINAL long serialVersionUID","0","0","","false","private","is(char), isNot(char), isIn(char,char), isNotIn(char,char)"
+"org.apache.commons.lang3.CharRange.contains(org.apache.commons.lang3.CharRange)","boolean contains(org.apache.commons.lang3.CharRange)","{
+    org.apache.commons.lang3.CharRange range, this;
+    unknown $stack10, $stack11, $stack12, $stack13, $stack14, $stack15, $stack16, $stack17, $stack18, $stack19, $stack2, $stack20, $stack21, $stack22, $stack23, $stack3, $stack4, $stack5, $stack6, $stack7, $stack8, $stack9;
+
+
+    this := @this: org.apache.commons.lang3.CharRange;
+    range := @parameter0: org.apache.commons.lang3.CharRange;
+
+    if range != null goto label1;
+    $stack23 = new java.lang.IllegalArgumentException;
+    specialinvoke $stack23.<java.lang.IllegalArgumentException: void <init>(java.lang.String)>(""The Range must not be null"");
+
+    throw $stack23;
+
+  label1:
+    $stack2 = this.<org.apache.commons.lang3.CharRange: boolean negated>;
+
+    if $stack2 == 0 goto label3;
+    $stack12 = range.<org.apache.commons.lang3.CharRange: boolean negated>;
+
+    if $stack12 == 0 goto label2;
+    $stack19 = this.<org.apache.commons.lang3.CharRange: char start>;
+    $stack18 = range.<org.apache.commons.lang3.CharRange: char start>;
+
+    if $stack19 < $stack18 goto label5;
+    $stack21 = this.<org.apache.commons.lang3.CharRange: char end>;
+    $stack20 = range.<org.apache.commons.lang3.CharRange: char end>;
+
+    if $stack21 > $stack20 goto label5;
+
+    return 1;
+
+  label2:
+    $stack14 = range.<org.apache.commons.lang3.CharRange: char end>;
+    $stack13 = this.<org.apache.commons.lang3.CharRange: char start>;
+
+    if $stack14 < $stack13 goto label6;
+    $stack16 = range.<org.apache.commons.lang3.CharRange: char start>;
+    $stack15 = this.<org.apache.commons.lang3.CharRange: char end>;
+
+    if $stack16 > $stack15 goto label6;
+
+    return 0;
+
+  label3:
+    $stack3 = range.<org.apache.commons.lang3.CharRange: boolean negated>;
+
+    if $stack3 == 0 goto label4;
+    $stack9 = this.<org.apache.commons.lang3.CharRange: char start>;
+
+    if $stack9 != 0 goto label7;
+    $stack10 = this.<org.apache.commons.lang3.CharRange: char end>;
+
+    if $stack10 != 65535 goto label7;
+
+    return 1;
+
+  label4:
+    $stack5 = this.<org.apache.commons.lang3.CharRange: char start>;
+    $stack4 = range.<org.apache.commons.lang3.CharRange: char start>;
+
+    if $stack5 > $stack4 goto label8;
+    $stack7 = this.<org.apache.commons.lang3.CharRange: char end>;
+    $stack6 = range.<org.apache.commons.lang3.CharRange: char end>;
+
+    if $stack7 < $stack6 goto label8;
+
+    return 1;
+
+  label5:
+    $stack22 = 0;
+
+    return $stack22;
+
+  label6:
+    $stack17 = 1;
+
+    return $stack17;
+
+  label7:
+    $stack11 = 0;
+
+    return $stack11;
+
+  label8:
+    $stack8 = 0;
+
+    return $stack8;
+}
+","false","PUBLIC","","<p>Is the character specified contained in this range.</p>
+@param ch the character to check
+@return {@code true} if this range contains the input character","implements java.io.Serializable, java.lang.Iterable","PRIVATE TRANSIENT java.lang.String iToString; PRIVATE FINAL char end; PRIVATE FINAL char start; PRIVATE FINAL boolean negated; PRIVATE STATIC FINAL long serialVersionUID","0","0","","","private","is(char), isNot(char), isIn(char,char), isNotIn(char,char)"
+"org.apache.commons.lang3.CharRange.iterator()","java.util.Iterator iterator()","{
+    org.apache.commons.lang3.CharRange this;
+    unknown $stack1;
+
+
+    this := @this: org.apache.commons.lang3.CharRange;
+    $stack1 = new org.apache.commons.lang3.CharRange$CharacterIterator;
+    specialinvoke $stack1.<org.apache.commons.lang3.CharRange$CharacterIterator: void <init>(org.apache.commons.lang3.CharRange,org.apache.commons.lang3.CharRange$CharacterIterator)>(this, null);
+
+    return $stack1;
+}
+","false","PUBLIC","Override","<p>Returns an iterator which can be used to walk through the characters described by this range.</p>
+
+<p>#NotThreadSafe# the iterator is not thread-safe</p>
+@return an iterator to the chars represented by this range
+@since 2.5","implements java.io.Serializable, java.lang.Iterable","PRIVATE TRANSIENT java.lang.String iToString; PRIVATE FINAL char end; PRIVATE FINAL char start; PRIVATE FINAL boolean negated; PRIVATE STATIC FINAL long serialVersionUID","0","0","","","private","is(char), isNot(char), isIn(char,char), isNotIn(char,char)"
+"org.apache.commons.lang3.CharRange.toString()","java.lang.String toString()","{
+    org.apache.commons.lang3.CharRange this;
+    unknown $stack10, $stack11, $stack12, $stack13, $stack14, $stack15, $stack16, $stack17, $stack18, $stack19, $stack2, $stack20, $stack21, $stack3, $stack4, $stack5, $stack6, $stack7, $stack8, $stack9, buf;
+
+
+    this := @this: org.apache.commons.lang3.CharRange;
+    $stack2 = this.<org.apache.commons.lang3.CharRange: java.lang.String iToString>;
+
+    if $stack2 != null goto label3;
+    $stack4 = new java.lang.StringBuilder;
+    specialinvoke $stack4.<java.lang.StringBuilder: void <init>(int)>(4);
+    buf = $stack4;
+    $stack5 = virtualinvoke this.<org.apache.commons.lang3.CharRange: boolean isNegated()>();
+
+    if $stack5 == 0 goto label1;
+    $stack17 = virtualinvoke buf.<java.lang.StringBuilder: java.lang.StringBuilder append(char)>(94);
+
+  label1:
+    $stack19 = buf;
+    $stack18 = this;
+    $stack6 = this.<org.apache.commons.lang3.CharRange: char start>;
+    $stack7 = virtualinvoke $stack19.<java.lang.StringBuilder: java.lang.StringBuilder append(char)>($stack6);
+    $stack20 = this;
+    $stack9 = this.<org.apache.commons.lang3.CharRange: char start>;
+    $stack21 = this;
+    $stack8 = this.<org.apache.commons.lang3.CharRange: char end>;
+
+    if $stack9 == $stack8 goto label2;
+    $stack12 = virtualinvoke buf.<java.lang.StringBuilder: java.lang.StringBuilder append(char)>(45);
+    $stack13 = this.<org.apache.commons.lang3.CharRange: char end>;
+    $stack14 = virtualinvoke buf.<java.lang.StringBuilder: java.lang.StringBuilder append(char)>($stack13);
+
+  label2:
+    $stack16 = this;
+    $stack15 = buf;
+    $stack10 = virtualinvoke $stack15.<java.lang.StringBuilder: java.lang.String toString()>();
+    this.<org.apache.commons.lang3.CharRange: java.lang.String iToString> = $stack10;
+
+  label3:
+    $stack11 = this;
+    $stack3 = this.<org.apache.commons.lang3.CharRange: java.lang.String iToString>;
+
+    return $stack3;
+}
+","false","PUBLIC","Override","<p>Gets a string representation of the character range.</p>
+@return string representation of this range","implements java.io.Serializable, java.lang.Iterable","PRIVATE TRANSIENT java.lang.String iToString; PRIVATE FINAL char end; PRIVATE FINAL char start; PRIVATE FINAL boolean negated; PRIVATE STATIC FINAL long serialVersionUID","0","3","org.apache.commons.lang3.CharRange.isNegated(), java.lang.StringBuilder.append(char), java.lang.StringBuilder.toString()","'^', '-', 4","private","is(char), isNot(char), isIn(char,char), isNotIn(char,char)"
+"org.apache.commons.lang3.CharRange.CharRange(char, char, boolean)","void CharRange(char, char, boolean)","{
+    boolean negated;
+    char end, start;
+    org.apache.commons.lang3.CharRange this;
+    unknown $stack10, $stack5, $stack6, $stack7, $stack8, $stack9, temp;
+
+
+    this := @this: org.apache.commons.lang3.CharRange;
+    start := @parameter0: char;
+    end := @parameter1: char;
+    negated := @parameter2: boolean;
+    specialinvoke this.<java.lang.Object: void <init>()>();
+
+    if start <= end goto label1;
+    temp = start;
+    start = end;
+    end = temp;
+
+  label1:
+    $stack6 = this;
+    $stack5 = start;
+    this.<org.apache.commons.lang3.CharRange: char start> = $stack5;
+    $stack8 = this;
+    $stack7 = end;
+    this.<org.apache.commons.lang3.CharRange: char end> = $stack7;
+    $stack10 = this;
+    $stack9 = negated;
+    this.<org.apache.commons.lang3.CharRange: boolean negated> = $stack9;
+
+    return;
+}
+","true","PRIVATE","","<p>Constructs a {@code CharRange} over a set of characters,
+optionally negating the range.</p>
+
+<p>A negated range includes everything except that defined by the
+start and end characters.</p>
+
+<p>If start and end are in the wrong order, they are reversed.
+Thus {@code a-e} is the same as {@code e-a}.</p>
+@param start first character, inclusive, in this range
+@param end last character, inclusive, in this range
+@param negated true to express everything except the range","implements java.io.Serializable, java.lang.Iterable","PRIVATE TRANSIENT java.lang.String iToString; PRIVATE FINAL char end; PRIVATE FINAL char start; PRIVATE FINAL boolean negated; PRIVATE STATIC FINAL long serialVersionUID","0","1","","","private","is(char), isNot(char), isIn(char,char), isNotIn(char,char)"
+"org.apache.commons.lang3.CharRange.isNotIn(char, char)","org.apache.commons.lang3.CharRange isNotIn(char, char)","{
+    char end, start;
+    unknown $stack2;
+
+
+    start := @parameter0: char;
+    end := @parameter1: char;
+    $stack2 = new org.apache.commons.lang3.CharRange;
+    specialinvoke $stack2.<org.apache.commons.lang3.CharRange: void <init>(char,char,boolean)>(start, end, 1);
+
+    return $stack2;
+}
+","false","PUBLIC STATIC","","<p>Constructs a negated {@code CharRange} over a set of characters.</p>
+@param start first character, inclusive, in this range
+@param end last character, inclusive, in this range
+@return the new CharRange object
+@see CharRange#CharRange(char, char, boolean)
+@since 2.5","implements java.io.Serializable, java.lang.Iterable","PRIVATE TRANSIENT java.lang.String iToString; PRIVATE FINAL char end; PRIVATE FINAL char start; PRIVATE FINAL boolean negated; PRIVATE STATIC FINAL long serialVersionUID","0","0","","true","private","is(char), isNot(char), isIn(char,char), isNotIn(char,char)"
+"org.apache.commons.lang3.CharRange.isNegated()","boolean isNegated()","{
+    org.apache.commons.lang3.CharRange this;
+    unknown $stack1;
+
+
+    this := @this: org.apache.commons.lang3.CharRange;
+    $stack1 = this.<org.apache.commons.lang3.CharRange: boolean negated>;
+
+    return $stack1;
+}
+","false","PUBLIC","","<p>Is this {@code CharRange} negated.</p>
+
+<p>A negated range includes everything except that defined by the
+start and end characters.</p>
+@return {@code true} if negated","implements java.io.Serializable, java.lang.Iterable","PRIVATE TRANSIENT java.lang.String iToString; PRIVATE FINAL char end; PRIVATE FINAL char start; PRIVATE FINAL boolean negated; PRIVATE STATIC FINAL long serialVersionUID","0","0","","","private","is(char), isNot(char), isIn(char,char), isNotIn(char,char)"
+"org.apache.commons.lang3.text.WordUtils.capitalize(java.lang.String)","java.lang.String capitalize(java.lang.String)","{
     java.lang.String str;
     unknown $stack1;
 
 
     str := @parameter0: java.lang.String;
-    $stack1 = staticinvoke <org.apache.commons.lang3.text.WordUtils: java.lang.String capitalizeFully(java.lang.String,char[])>(str, null);
+    $stack1 = staticinvoke <org.apache.commons.lang3.text.WordUtils: java.lang.String capitalize(java.lang.String,char[])>(str, null);
 
     return $stack1;
 }
-","false","PUBLIC STATIC","","<p>Converts all the whitespace separated words in a String into capitalized words, 
-that is each word is made up of a titlecase character and then a series of 
-lowercase characters.  </p>
+","false","PUBLIC STATIC","","<p>Capitalizes all the whitespace separated words in a String.
+Only the first letter of each word is changed. To convert the 
+rest of each word to lowercase at the same time, 
+use {@link #capitalizeFully(String)}.</p>
 
 <p>Whitespace is defined by {@link Character#isWhitespace(char)}.
 A <code>null</code> input String returns <code>null</code>.
@@ -43,12 +850,258 @@ Capitalization uses the Unicode title case, normally equivalent to
 upper case.</p>
 
 <pre>
-WordUtils.capitalizeFully(null)        = null
-WordUtils.capitalizeFully("""")          = """"
-WordUtils.capitalizeFully(""i am FINE"") = ""I Am Fine""
+WordUtils.capitalize(null)        = null
+WordUtils.capitalize("""")          = """"
+WordUtils.capitalize(""i am FINE"") = ""I Am FINE""
 </pre>
 @param str the String to capitalize, may be null
-@return capitalized String, <code>null</code> if null String input","","","0","0","","","public"
+@return capitalized String, <code>null</code> if null String input
+@see #uncapitalize(String)
+@see #capitalizeFully(String)","","","0","0","","","public",""
+"org.apache.commons.lang3.text.WordUtils.capitalize(java.lang.String, char[])","java.lang.String capitalize(java.lang.String, char[])","{
+    char[] delimiters;
+    java.lang.String str;
+    unknown $stack10, $stack11, $stack12, $stack13, $stack14, $stack15, $stack16, $stack7, $stack8, $stack9, buffer, capitalizeNext, ch, delimLen, i;
+
+
+    str := @parameter0: java.lang.String;
+    delimiters := @parameter1: char[];
+
+    if delimiters != null goto label1;
+    $stack15 = -1;
+
+    goto label2;
+
+  label1:
+    $stack15 = lengthof delimiters;
+
+  label2:
+    $stack16 = str;
+    $stack7 = staticinvoke <org.apache.commons.lang3.StringUtils: boolean isEmpty(java.lang.CharSequence)>($stack16);
+
+    if $stack7 != 0 goto label3;
+
+    if delimLen != 0 goto label4;
+
+  label3:
+    $stack14 = str;
+
+    return $stack14;
+
+  label4:
+    buffer = virtualinvoke str.<java.lang.String: char[] toCharArray()>();
+    capitalizeNext = 1;
+    i = 0;
+
+    goto label7;
+
+  label5:
+    if capitalizeNext == 0 goto label6;
+    $stack12 = staticinvoke <java.lang.Character: char toTitleCase(char)>(ch);
+    buffer[i] = $stack12;
+    capitalizeNext = 0;
+
+  label6:
+    i = i + 1;
+
+  label7:
+    $stack11 = i;
+    $stack10 = buffer;
+    $stack8 = lengthof $stack10;
+
+    if $stack11 < $stack8 goto label8;
+    $stack13 = new java.lang.String;
+    specialinvoke $stack13.<java.lang.String: void <init>(char[])>(buffer);
+
+    return $stack13;
+
+  label8:
+    ch = buffer[i];
+    $stack9 = staticinvoke <org.apache.commons.lang3.text.WordUtils: boolean isDelimiter(char,char[])>(ch, delimiters);
+
+    if $stack9 == 0 goto label5;
+    capitalizeNext = 1;
+
+    goto label6;
+}
+","false","PUBLIC STATIC TRANSIENT","","<p>Capitalizes all the delimiter separated words in a String.
+Only the first letter of each word is changed. To convert the 
+rest of each word to lowercase at the same time, 
+use {@link #capitalizeFully(String, char[])}.</p>
+
+<p>The delimiters represent a set of characters understood to separate words.
+The first string character and the first non-delimiter character after a
+delimiter will be capitalized. </p>
+
+<p>A <code>null</code> input String returns <code>null</code>.
+Capitalization uses the Unicode title case, normally equivalent to
+upper case.</p>
+
+<pre>
+WordUtils.capitalize(null, *)            = null
+WordUtils.capitalize("""", *)              = """"
+WordUtils.capitalize(*, new char[0])     = *
+WordUtils.capitalize(""i am fine"", null)  = ""I Am Fine""
+WordUtils.capitalize(""i aM.fine"", {'.'}) = ""I aM.Fine""
+</pre>
+@param str the String to capitalize, may be null
+@param delimiters set of characters to determine capitalization, null means whitespace
+@return capitalized String, <code>null</code> if null String input
+@see #uncapitalize(String)
+@see #capitalizeFully(String)
+@since 2.1","","","1","3","org.apache.commons.lang3.StringUtils.isEmpty(java.lang.CharSequence), java.lang.String.toCharArray(), org.apache.commons.lang3.text.WordUtils.isDelimiter(char, char[]), java.lang.Character.toTitleCase(char)","1, 0, true, false","public",""
+"org.apache.commons.lang3.text.WordUtils.capitalizeFully(java.lang.String, char[])","java.lang.String capitalizeFully(java.lang.String, char[])","{
+    char[] delimiters;
+    java.lang.String str;
+    unknown $stack3, $stack4, $stack5, $stack6, $stack7, delimLen;
+
+
+    str := @parameter0: java.lang.String;
+    delimiters := @parameter1: char[];
+
+    if delimiters != null goto label1;
+    $stack6 = -1;
+
+    goto label2;
+
+  label1:
+    $stack6 = lengthof delimiters;
+
+  label2:
+    $stack7 = str;
+    $stack3 = staticinvoke <org.apache.commons.lang3.StringUtils: boolean isEmpty(java.lang.CharSequence)>($stack7);
+
+    if $stack3 != 0 goto label3;
+
+    if delimLen != 0 goto label4;
+
+  label3:
+    $stack5 = str;
+
+    return $stack5;
+
+  label4:
+    str = virtualinvoke str.<java.lang.String: java.lang.String toLowerCase()>();
+    $stack4 = staticinvoke <org.apache.commons.lang3.text.WordUtils: java.lang.String capitalize(java.lang.String,char[])>(str, delimiters);
+
+    return $stack4;
+}
+","false","PUBLIC STATIC TRANSIENT","","<p>Converts all the delimiter separated words in a String into capitalized words, 
+that is each word is made up of a titlecase character and then a series of 
+lowercase characters. </p>
+
+<p>The delimiters represent a set of characters understood to separate words.
+The first string character and the first non-delimiter character after a
+delimiter will be capitalized. </p>
+
+<p>A <code>null</code> input String returns <code>null</code>.
+Capitalization uses the Unicode title case, normally equivalent to
+upper case.</p>
+
+<pre>
+WordUtils.capitalizeFully(null, *)            = null
+WordUtils.capitalizeFully("""", *)              = """"
+WordUtils.capitalizeFully(*, null)            = *
+WordUtils.capitalizeFully(*, new char[0])     = *
+WordUtils.capitalizeFully(""i aM.fine"", {'.'}) = ""I am.Fine""
+</pre>
+@param str the String to capitalize, may be null
+@param delimiters set of characters to determine capitalization, null means whitespace
+@return capitalized String, <code>null</code> if null String input
+@since 2.1","","","0","1","org.apache.commons.lang3.StringUtils.isEmpty(java.lang.CharSequence), java.lang.String.toLowerCase(), org.apache.commons.lang3.text.WordUtils.capitalize(java.lang.String, char...)","1, 0","public",""
+"org.apache.commons.lang3.text.WordUtils.initials(java.lang.String, char[])","java.lang.String initials(java.lang.String, char[])","{
+    char[] delimiters;
+    java.lang.String str;
+    unknown $stack10, $stack11, $stack12, $stack13, $stack14, $stack15, $stack16, $stack17, $stack18, $stack19, $stack20, $stack21, $stack22, $stack23, $stack24, $stack25, $stack8, $stack9, buf, ch, count, i, lastWasGap, strLen;
+
+
+    str := @parameter0: java.lang.String;
+    delimiters := @parameter1: char[];
+    $stack8 = staticinvoke <org.apache.commons.lang3.StringUtils: boolean isEmpty(java.lang.CharSequence)>(str);
+
+    if $stack8 == 0 goto label1;
+
+    return str;
+
+  label1:
+    if delimiters == null goto label2;
+    $stack16 = lengthof delimiters;
+
+    if $stack16 != 0 goto label2;
+
+    return """";
+
+  label2:
+    $stack17 = str;
+    $stack18 = virtualinvoke str.<java.lang.String: int length()>();
+    $stack20 = strLen;
+    $stack19 = 2;
+    $stack9 = $stack20 / $stack19;
+    $stack21 = 1;
+    $stack10 = $stack9 + $stack21;
+    $stack22 = newarray (char)[$stack10];
+    $stack23 = 0;
+    count = $stack23;
+    $stack24 = 1;
+    lastWasGap = $stack24;
+    $stack25 = 0;
+    i = $stack25;
+
+    goto label5;
+
+  label3:
+    if lastWasGap == 0 goto label4;
+    $stack14 = count;
+    count = count + 1;
+    buf[$stack14] = ch;
+    lastWasGap = 0;
+
+  label4:
+    i = i + 1;
+
+  label5:
+    $stack13 = i;
+    $stack12 = strLen;
+
+    if $stack13 < $stack12 goto label6;
+    $stack15 = new java.lang.String;
+    specialinvoke $stack15.<java.lang.String: void <init>(char[],int,int)>(buf, 0, count);
+
+    return $stack15;
+
+  label6:
+    ch = virtualinvoke str.<java.lang.String: char charAt(int)>(i);
+    $stack11 = staticinvoke <org.apache.commons.lang3.text.WordUtils: boolean isDelimiter(char,char[])>(ch, delimiters);
+
+    if $stack11 == 0 goto label3;
+    lastWasGap = 1;
+
+    goto label4;
+}
+","false","PUBLIC STATIC TRANSIENT","","<p>Extracts the initial letters from each word in the String.</p>
+
+<p>The first letter of the string and all first letters after the
+defined delimiters are returned as a new string.
+Their case is not changed.</p>
+
+<p>If the delimiters array is null, then Whitespace is used.
+Whitespace is defined by {@link Character#isWhitespace(char)}.
+A <code>null</code> input String returns <code>null</code>.
+An empty delimiter array returns an empty String.</p>
+
+<pre>
+WordUtils.initials(null, *)                = null
+WordUtils.initials("""", *)                  = """"
+WordUtils.initials(""Ben John Lee"", null)   = ""BJL""
+WordUtils.initials(""Ben J.Lee"", null)      = ""BJ""
+WordUtils.initials(""Ben J.Lee"", [' ','.']) = ""BJL""
+WordUtils.initials(*, new char[0])         = """"
+</pre>
+@param str the String to get initials from, may be null
+@param delimiters set of characters to determine words, null means whitespace
+@return String of initial letters, <code>null</code> if null String input
+@see #initials(String)
+@since 2.2","","","1","4","org.apache.commons.lang3.StringUtils.isEmpty(java.lang.CharSequence), java.lang.String.length(), java.lang.String.charAt(int), org.apache.commons.lang3.text.WordUtils.isDelimiter(char, char[])",""""", 0, 2, 1, true, false","public",""
 "org.apache.commons.lang3.text.WordUtils.uncapitalize(java.lang.String)","java.lang.String uncapitalize(java.lang.String)","{
     java.lang.String str;
     unknown $stack1;
@@ -72,79 +1125,110 @@ WordUtils.uncapitalize(""I Am FINE"") = ""i am fINE""
 </pre>
 @param str the String to uncapitalize, may be null
 @return uncapitalized String, <code>null</code> if null String input
-@see #capitalize(String)","","","0","0","","","public"
-"org.apache.commons.lang3.text.WordUtils.isDelimiter(char, char[])","boolean isDelimiter(char, char[])","{
-    char ch;
-    char[] delimiters;
-    unknown $stack6, $stack7, $stack8, delimiter, l3, l4, l5;
+@see #capitalize(String)","","","0","0","","","public",""
+"org.apache.commons.lang3.text.WordUtils.WordUtils()","void WordUtils()","{
+    org.apache.commons.lang3.text.WordUtils this;
 
 
-    ch := @parameter0: char;
-    delimiters := @parameter1: char[];
+    this := @this: org.apache.commons.lang3.text.WordUtils;
+    specialinvoke this.<java.lang.Object: void <init>()>();
 
-    if delimiters != null goto label1;
-    $stack8 = staticinvoke <java.lang.Character: boolean isWhitespace(char)>(ch);
-
-    return $stack8;
-
-  label1:
-    l5 = delimiters;
-    l4 = lengthof delimiters;
-    l3 = 0;
-
-    goto label3;
-
-  label2:
-    l3 = l3 + 1;
-
-  label3:
-    $stack7 = l3;
-    $stack6 = l4;
-
-    if $stack7 < $stack6 goto label4;
-
-    return 0;
-
-  label4:
-    delimiter = l5[l3];
-
-    if ch != delimiter goto label2;
-
-    return 1;
+    return;
 }
-","false","PRIVATE STATIC","","Is the character a delimiter.
-@param ch the character to check
-@param delimiters the delimiters
-@return true if it is a delimiter","","","0","2","java.lang.Character.isWhitespace(char)","true, false","public"
-"org.apache.commons.lang3.text.WordUtils.initials(java.lang.String)","java.lang.String initials(java.lang.String)","{
+","true","PUBLIC","","<p><code>WordUtils</code> instances should NOT be constructed in
+standard programming. Instead, the class should be used as
+<code>WordUtils.wrap(""foo bar"", 20);</code>.</p>
+
+<p>This constructor is public to permit tools that require a JavaBean
+instance to operate.</p>","","","0","0","","","public",""
+"org.apache.commons.lang3.text.WordUtils.uncapitalize(java.lang.String, char[])","java.lang.String uncapitalize(java.lang.String, char[])","{
+    char[] delimiters;
     java.lang.String str;
-    unknown $stack1;
+    unknown $stack10, $stack11, $stack12, $stack13, $stack14, $stack15, $stack16, $stack7, $stack8, $stack9, buffer, ch, delimLen, i, uncapitalizeNext;
 
 
     str := @parameter0: java.lang.String;
-    $stack1 = staticinvoke <org.apache.commons.lang3.text.WordUtils: java.lang.String initials(java.lang.String,char[])>(str, null);
+    delimiters := @parameter1: char[];
 
-    return $stack1;
+    if delimiters != null goto label1;
+    $stack15 = -1;
+
+    goto label2;
+
+  label1:
+    $stack15 = lengthof delimiters;
+
+  label2:
+    $stack16 = str;
+    $stack7 = staticinvoke <org.apache.commons.lang3.StringUtils: boolean isEmpty(java.lang.CharSequence)>($stack16);
+
+    if $stack7 != 0 goto label3;
+
+    if delimLen != 0 goto label4;
+
+  label3:
+    $stack14 = str;
+
+    return $stack14;
+
+  label4:
+    buffer = virtualinvoke str.<java.lang.String: char[] toCharArray()>();
+    uncapitalizeNext = 1;
+    i = 0;
+
+    goto label7;
+
+  label5:
+    if uncapitalizeNext == 0 goto label6;
+    $stack12 = staticinvoke <java.lang.Character: char toLowerCase(char)>(ch);
+    buffer[i] = $stack12;
+    uncapitalizeNext = 0;
+
+  label6:
+    i = i + 1;
+
+  label7:
+    $stack11 = i;
+    $stack10 = buffer;
+    $stack8 = lengthof $stack10;
+
+    if $stack11 < $stack8 goto label8;
+    $stack13 = new java.lang.String;
+    specialinvoke $stack13.<java.lang.String: void <init>(char[])>(buffer);
+
+    return $stack13;
+
+  label8:
+    ch = buffer[i];
+    $stack9 = staticinvoke <org.apache.commons.lang3.text.WordUtils: boolean isDelimiter(char,char[])>(ch, delimiters);
+
+    if $stack9 == 0 goto label5;
+    uncapitalizeNext = 1;
+
+    goto label6;
 }
-","false","PUBLIC STATIC","","<p>Extracts the initial letters from each word in the String.</p>
+","false","PUBLIC STATIC TRANSIENT","","<p>Uncapitalizes all the whitespace separated words in a String.
+Only the first letter of each word is changed.</p>
 
-<p>The first letter of the string and all first letters after
-whitespace are returned as a new string.
-Their case is not changed.</p>
+<p>The delimiters represent a set of characters understood to separate words.
+The first string character and the first non-delimiter character after a
+delimiter will be uncapitalized. </p>
 
 <p>Whitespace is defined by {@link Character#isWhitespace(char)}.
 A <code>null</code> input String returns <code>null</code>.</p>
 
 <pre>
-WordUtils.initials(null)             = null
-WordUtils.initials("""")               = """"
-WordUtils.initials(""Ben John Lee"")   = ""BJL""
-WordUtils.initials(""Ben J.Lee"")      = ""BJ""
+WordUtils.uncapitalize(null, *)            = null
+WordUtils.uncapitalize("""", *)              = """"
+WordUtils.uncapitalize(*, null)            = *
+WordUtils.uncapitalize(*, new char[0])     = *
+WordUtils.uncapitalize(""I AM.FINE"", {'.'}) = ""i AM.fINE""
 </pre>
-@param str the String to get initials from, may be null
-@return String of initial letters, <code>null</code> if null String input
-@see #initials(String,char[])
-@since 2.2","","","0","0","","","public"
+@param str the String to uncapitalize, may be null
+@param delimiters set of characters to determine uncapitalization, null means whitespace
+@return uncapitalized String, <code>null</code> if null String input
+@see #capitalize(String)
+@since 2.1","","","1","3","org.apache.commons.lang3.StringUtils.isEmpty(java.lang.CharSequence), java.lang.String.toCharArray(), org.apache.commons.lang3.text.WordUtils.isDelimiter(char, char[]), java.lang.Character.toLowerCase(char)","1, 0, true, false","public",""
 "org.apache.commons.lang3.text.WordUtils.swapCase(java.lang.String)","java.lang.String swapCase(java.lang.String)","{
     java.lang.String str;
     unknown $stack10, $stack11, $stack12, $stack13, $stack14, $stack15, $stack16, $stack5, $stack6, $stack7, $stack8, $stack9, buffer, ch, i, whitespace;
@@ -238,214 +1322,7 @@ StringUtils.swapCase("""")                   = """"
 StringUtils.swapCase(""The dog has a BONE"") = ""tHE DOG HAS A bone""
 </pre>
 @param str the String to swap case, may be null
-@return the changed String, <code>null</code> if null String input","","","1","5","org.apache.commons.lang3.StringUtils.isEmpty(java.lang.CharSequence), java.lang.String.toCharArray(), java.lang.Character.isUpperCase(char), java.lang.Character.toLowerCase(char), java.lang.Character.isTitleCase(char), java.lang.Character.isLowerCase(char), java.lang.Character.toTitleCase(char), java.lang.Character.toUpperCase(char), java.lang.Character.isWhitespace(char)","0, true, false","public"
-"org.apache.commons.lang3.text.WordUtils.wrap(java.lang.String, int)","java.lang.String wrap(java.lang.String, int)","{
-    int wrapLength;
-    java.lang.String str;
-    unknown $stack2;
-
-
-    str := @parameter0: java.lang.String;
-    wrapLength := @parameter1: int;
-    $stack2 = staticinvoke <org.apache.commons.lang3.text.WordUtils: java.lang.String wrap(java.lang.String,int,java.lang.String,boolean)>(str, wrapLength, null, 0);
-
-    return $stack2;
-}
-","false","PUBLIC STATIC","","<p>Wraps a single line of text, identifying words by <code>' '</code>.</p>
-
-<p>New lines will be separated by the system property line separator.
-Very long words, such as URLs will <i>not</i> be wrapped.</p>
-
-<p>Leading spaces on a new line are stripped.
-Trailing spaces are not stripped.</p>
-
-<pre>
-WordUtils.wrap(null, *) = null
-WordUtils.wrap("""", *) = """"
-</pre>
-@param str the String to be word wrapped, may be null
-@param wrapLength the column to wrap the words at, less than 1 is treated as 1
-@return a line with newlines inserted, <code>null</code> if null input","","","0","0","org.apache.commons.lang3.text.WordUtils.wrap(java.lang.String, int, java.lang.String, boolean)","false","public"
-"org.apache.commons.lang3.text.WordUtils.capitalize(java.lang.String, char[])","java.lang.String capitalize(java.lang.String, char[])","{
-    char[] delimiters;
-    java.lang.String str;
-    unknown $stack10, $stack11, $stack12, $stack13, $stack14, $stack15, $stack16, $stack7, $stack8, $stack9, buffer, capitalizeNext, ch, delimLen, i;
-
-
-    str := @parameter0: java.lang.String;
-    delimiters := @parameter1: char[];
-
-    if delimiters != null goto label1;
-    $stack15 = -1;
-
-    goto label2;
-
-  label1:
-    $stack15 = lengthof delimiters;
-
-  label2:
-    $stack16 = str;
-    $stack7 = staticinvoke <org.apache.commons.lang3.StringUtils: boolean isEmpty(java.lang.CharSequence)>($stack16);
-
-    if $stack7 != 0 goto label3;
-
-    if delimLen != 0 goto label4;
-
-  label3:
-    $stack14 = str;
-
-    return $stack14;
-
-  label4:
-    buffer = virtualinvoke str.<java.lang.String: char[] toCharArray()>();
-    capitalizeNext = 1;
-    i = 0;
-
-    goto label7;
-
-  label5:
-    if capitalizeNext == 0 goto label6;
-    $stack12 = staticinvoke <java.lang.Character: char toTitleCase(char)>(ch);
-    buffer[i] = $stack12;
-    capitalizeNext = 0;
-
-  label6:
-    i = i + 1;
-
-  label7:
-    $stack11 = i;
-    $stack10 = buffer;
-    $stack8 = lengthof $stack10;
-
-    if $stack11 < $stack8 goto label8;
-    $stack13 = new java.lang.String;
-    specialinvoke $stack13.<java.lang.String: void <init>(char[])>(buffer);
-
-    return $stack13;
-
-  label8:
-    ch = buffer[i];
-    $stack9 = staticinvoke <org.apache.commons.lang3.text.WordUtils: boolean isDelimiter(char,char[])>(ch, delimiters);
-
-    if $stack9 == 0 goto label5;
-    capitalizeNext = 1;
-
-    goto label6;
-}
-","false","PUBLIC STATIC TRANSIENT","","<p>Capitalizes all the delimiter separated words in a String.
-Only the first letter of each word is changed. To convert the 
-rest of each word to lowercase at the same time, 
-use {@link #capitalizeFully(String, char[])}.</p>
-
-<p>The delimiters represent a set of characters understood to separate words.
-The first string character and the first non-delimiter character after a
-delimiter will be capitalized. </p>
-
-<p>A <code>null</code> input String returns <code>null</code>.
-Capitalization uses the Unicode title case, normally equivalent to
-upper case.</p>
-
-<pre>
-WordUtils.capitalize(null, *)            = null
-WordUtils.capitalize("""", *)              = """"
-WordUtils.capitalize(*, new char[0])     = *
-WordUtils.capitalize(""i am fine"", null)  = ""I Am Fine""
-WordUtils.capitalize(""i aM.fine"", {'.'}) = ""I aM.Fine""
-</pre>
-@param str the String to capitalize, may be null
-@param delimiters set of characters to determine capitalization, null means whitespace
-@return capitalized String, <code>null</code> if null String input
-@see #uncapitalize(String)
-@see #capitalizeFully(String)
-@since 2.1","","","1","3","org.apache.commons.lang3.StringUtils.isEmpty(java.lang.CharSequence), java.lang.String.toCharArray(), org.apache.commons.lang3.text.WordUtils.isDelimiter(char, char[]), java.lang.Character.toTitleCase(char)","1, 0, true, false","public"
-"org.apache.commons.lang3.text.WordUtils.uncapitalize(java.lang.String, char[])","java.lang.String uncapitalize(java.lang.String, char[])","{
-    char[] delimiters;
-    java.lang.String str;
-    unknown $stack10, $stack11, $stack12, $stack13, $stack14, $stack15, $stack16, $stack7, $stack8, $stack9, buffer, ch, delimLen, i, uncapitalizeNext;
-
-
-    str := @parameter0: java.lang.String;
-    delimiters := @parameter1: char[];
-
-    if delimiters != null goto label1;
-    $stack15 = -1;
-
-    goto label2;
-
-  label1:
-    $stack15 = lengthof delimiters;
-
-  label2:
-    $stack16 = str;
-    $stack7 = staticinvoke <org.apache.commons.lang3.StringUtils: boolean isEmpty(java.lang.CharSequence)>($stack16);
-
-    if $stack7 != 0 goto label3;
-
-    if delimLen != 0 goto label4;
-
-  label3:
-    $stack14 = str;
-
-    return $stack14;
-
-  label4:
-    buffer = virtualinvoke str.<java.lang.String: char[] toCharArray()>();
-    uncapitalizeNext = 1;
-    i = 0;
-
-    goto label7;
-
-  label5:
-    if uncapitalizeNext == 0 goto label6;
-    $stack12 = staticinvoke <java.lang.Character: char toLowerCase(char)>(ch);
-    buffer[i] = $stack12;
-    uncapitalizeNext = 0;
-
-  label6:
-    i = i + 1;
-
-  label7:
-    $stack11 = i;
-    $stack10 = buffer;
-    $stack8 = lengthof $stack10;
-
-    if $stack11 < $stack8 goto label8;
-    $stack13 = new java.lang.String;
-    specialinvoke $stack13.<java.lang.String: void <init>(char[])>(buffer);
-
-    return $stack13;
-
-  label8:
-    ch = buffer[i];
-    $stack9 = staticinvoke <org.apache.commons.lang3.text.WordUtils: boolean isDelimiter(char,char[])>(ch, delimiters);
-
-    if $stack9 == 0 goto label5;
-    uncapitalizeNext = 1;
-
-    goto label6;
-}
-","false","PUBLIC STATIC TRANSIENT","","<p>Uncapitalizes all the whitespace separated words in a String.
-Only the first letter of each word is changed.</p>
-
-<p>The delimiters represent a set of characters understood to separate words.
-The first string character and the first non-delimiter character after a
-delimiter will be uncapitalized. </p>
-
-<p>Whitespace is defined by {@link Character#isWhitespace(char)}.
-A <code>null</code> input String returns <code>null</code>.</p>
-
-<pre>
-WordUtils.uncapitalize(null, *)            = null
-WordUtils.uncapitalize("""", *)              = """"
-WordUtils.uncapitalize(*, null)            = *
-WordUtils.uncapitalize(*, new char[0])     = *
-WordUtils.uncapitalize(""I AM.FINE"", {'.'}) = ""i AM.fINE""
-</pre>
-@param str the String to uncapitalize, may be null
-@param delimiters set of characters to determine uncapitalization, null means whitespace
-@return uncapitalized String, <code>null</code> if null String input
-@see #capitalize(String)
-@since 2.1","","","1","3","org.apache.commons.lang3.StringUtils.isEmpty(java.lang.CharSequence), java.lang.String.toCharArray(), org.apache.commons.lang3.text.WordUtils.isDelimiter(char, char[]), java.lang.Character.toLowerCase(char)","1, 0, true, false","public"
+@return the changed String, <code>null</code> if null String input","","","1","5","org.apache.commons.lang3.StringUtils.isEmpty(java.lang.CharSequence), java.lang.String.toCharArray(), java.lang.Character.isUpperCase(char), java.lang.Character.toLowerCase(char), java.lang.Character.isTitleCase(char), java.lang.Character.isLowerCase(char), java.lang.Character.toTitleCase(char), java.lang.Character.toUpperCase(char), java.lang.Character.isWhitespace(char)","0, true, false","public",""
 "org.apache.commons.lang3.text.WordUtils.wrap(java.lang.String, int, java.lang.String, boolean)","java.lang.String wrap(java.lang.String, int, java.lang.String, boolean)","{
     boolean wrapLongWords;
     int wrapLength;
@@ -561,95 +1438,90 @@ WordUtils.wrap("""", *, *, *) = """"
 @param newLineStr the string to insert for a new line, 
  <code>null</code> uses the system property line separator
 @param wrapLongWords true if long words (such as URLs) should be wrapped
-@return a line with newlines inserted, <code>null</code> if null input","","","1","7","java.lang.String.length(), java.lang.String.charAt(int), java.lang.String.lastIndexOf(int, int), java.lang.StringBuilder.append(java.lang.String), java.lang.String.substring(int, int), java.lang.String.indexOf(int, int), java.lang.String.substring(int), java.lang.StringBuilder.toString()","' ', 1, 0, 32","public"
-"org.apache.commons.lang3.text.WordUtils.capitalizeFully(java.lang.String, char[])","java.lang.String capitalizeFully(java.lang.String, char[])","{
+@return a line with newlines inserted, <code>null</code> if null input","","","1","7","java.lang.String.length(), java.lang.String.charAt(int), java.lang.String.lastIndexOf(int, int), java.lang.StringBuilder.append(java.lang.String), java.lang.String.substring(int, int), java.lang.String.indexOf(int, int), java.lang.String.substring(int), java.lang.StringBuilder.toString()","' ', 1, 0, 32","public",""
+"org.apache.commons.lang3.text.WordUtils.isDelimiter(char, char[])","boolean isDelimiter(char, char[])","{
+    char ch;
     char[] delimiters;
-    java.lang.String str;
-    unknown $stack3, $stack4, $stack5, $stack6, $stack7, delimLen;
+    unknown $stack6, $stack7, $stack8, delimiter, l3, l4, l5;
 
 
-    str := @parameter0: java.lang.String;
+    ch := @parameter0: char;
     delimiters := @parameter1: char[];
 
     if delimiters != null goto label1;
-    $stack6 = -1;
+    $stack8 = staticinvoke <java.lang.Character: boolean isWhitespace(char)>(ch);
 
-    goto label2;
+    return $stack8;
 
   label1:
-    $stack6 = lengthof delimiters;
+    l5 = delimiters;
+    l4 = lengthof delimiters;
+    l3 = 0;
+
+    goto label3;
 
   label2:
-    $stack7 = str;
-    $stack3 = staticinvoke <org.apache.commons.lang3.StringUtils: boolean isEmpty(java.lang.CharSequence)>($stack7);
-
-    if $stack3 != 0 goto label3;
-
-    if delimLen != 0 goto label4;
+    l3 = l3 + 1;
 
   label3:
-    $stack5 = str;
+    $stack7 = l3;
+    $stack6 = l4;
 
-    return $stack5;
+    if $stack7 < $stack6 goto label4;
+
+    return 0;
 
   label4:
-    str = virtualinvoke str.<java.lang.String: java.lang.String toLowerCase()>();
-    $stack4 = staticinvoke <org.apache.commons.lang3.text.WordUtils: java.lang.String capitalize(java.lang.String,char[])>(str, delimiters);
+    delimiter = l5[l3];
 
-    return $stack4;
+    if ch != delimiter goto label2;
+
+    return 1;
 }
-","false","PUBLIC STATIC TRANSIENT","","<p>Converts all the delimiter separated words in a String into capitalized words, 
-that is each word is made up of a titlecase character and then a series of 
-lowercase characters. </p>
+","false","PRIVATE STATIC","","Is the character a delimiter.
+@param ch the character to check
+@param delimiters the delimiters
+@return true if it is a delimiter","","","0","2","java.lang.Character.isWhitespace(char)","true, false","public",""
+"org.apache.commons.lang3.text.WordUtils.wrap(java.lang.String, int)","java.lang.String wrap(java.lang.String, int)","{
+    int wrapLength;
+    java.lang.String str;
+    unknown $stack2;
 
-<p>The delimiters represent a set of characters understood to separate words.
-The first string character and the first non-delimiter character after a
-delimiter will be capitalized. </p>
 
-<p>A <code>null</code> input String returns <code>null</code>.
-Capitalization uses the Unicode title case, normally equivalent to
-upper case.</p>
+    str := @parameter0: java.lang.String;
+    wrapLength := @parameter1: int;
+    $stack2 = staticinvoke <org.apache.commons.lang3.text.WordUtils: java.lang.String wrap(java.lang.String,int,java.lang.String,boolean)>(str, wrapLength, null, 0);
+
+    return $stack2;
+}
+","false","PUBLIC STATIC","","<p>Wraps a single line of text, identifying words by <code>' '</code>.</p>
+
+<p>New lines will be separated by the system property line separator.
+Very long words, such as URLs will <i>not</i> be wrapped.</p>
+
+<p>Leading spaces on a new line are stripped.
+Trailing spaces are not stripped.</p>
 
 <pre>
-WordUtils.capitalizeFully(null, *)            = null
-WordUtils.capitalizeFully("""", *)              = """"
-WordUtils.capitalizeFully(*, null)            = *
-WordUtils.capitalizeFully(*, new char[0])     = *
-WordUtils.capitalizeFully(""i aM.fine"", {'.'}) = ""I am.Fine""
+WordUtils.wrap(null, *) = null
+WordUtils.wrap("""", *) = """"
 </pre>
-@param str the String to capitalize, may be null
-@param delimiters set of characters to determine capitalization, null means whitespace
-@return capitalized String, <code>null</code> if null String input
-@since 2.1","","","0","1","org.apache.commons.lang3.StringUtils.isEmpty(java.lang.CharSequence), java.lang.String.toLowerCase(), org.apache.commons.lang3.text.WordUtils.capitalize(java.lang.String, char...)","1, 0","public"
-"org.apache.commons.lang3.text.WordUtils.WordUtils()","void WordUtils()","{
-    org.apache.commons.lang3.text.WordUtils this;
-
-
-    this := @this: org.apache.commons.lang3.text.WordUtils;
-    specialinvoke this.<java.lang.Object: void <init>()>();
-
-    return;
-}
-","true","PUBLIC","","<p><code>WordUtils</code> instances should NOT be constructed in
-standard programming. Instead, the class should be used as
-<code>WordUtils.wrap(""foo bar"", 20);</code>.</p>
-
-<p>This constructor is public to permit tools that require a JavaBean
-instance to operate.</p>","","","0","0","","","public"
-"org.apache.commons.lang3.text.WordUtils.capitalize(java.lang.String)","java.lang.String capitalize(java.lang.String)","{
+@param str the String to be word wrapped, may be null
+@param wrapLength the column to wrap the words at, less than 1 is treated as 1
+@return a line with newlines inserted, <code>null</code> if null input","","","0","0","org.apache.commons.lang3.text.WordUtils.wrap(java.lang.String, int, java.lang.String, boolean)","false","public",""
+"org.apache.commons.lang3.text.WordUtils.capitalizeFully(java.lang.String)","java.lang.String capitalizeFully(java.lang.String)","{
     java.lang.String str;
     unknown $stack1;
 
 
     str := @parameter0: java.lang.String;
-    $stack1 = staticinvoke <org.apache.commons.lang3.text.WordUtils: java.lang.String capitalize(java.lang.String,char[])>(str, null);
+    $stack1 = staticinvoke <org.apache.commons.lang3.text.WordUtils: java.lang.String capitalizeFully(java.lang.String,char[])>(str, null);
 
     return $stack1;
 }
-","false","PUBLIC STATIC","","<p>Capitalizes all the whitespace separated words in a String.
-Only the first letter of each word is changed. To convert the 
-rest of each word to lowercase at the same time, 
-use {@link #capitalizeFully(String)}.</p>
+","false","PUBLIC STATIC","","<p>Converts all the whitespace separated words in a String into capitalized words, 
+that is each word is made up of a titlecase character and then a series of 
+lowercase characters.  </p>
 
 <p>Whitespace is defined by {@link Character#isWhitespace(char)}.
 A <code>null</code> input String returns <code>null</code>.
@@ -657,934 +1529,62 @@ Capitalization uses the Unicode title case, normally equivalent to
 upper case.</p>
 
 <pre>
-WordUtils.capitalize(null)        = null
-WordUtils.capitalize("""")          = """"
-WordUtils.capitalize(""i am FINE"") = ""I Am FINE""
+WordUtils.capitalizeFully(null)        = null
+WordUtils.capitalizeFully("""")          = """"
+WordUtils.capitalizeFully(""i am FINE"") = ""I Am Fine""
 </pre>
 @param str the String to capitalize, may be null
-@return capitalized String, <code>null</code> if null String input
-@see #uncapitalize(String)
-@see #capitalizeFully(String)","","","0","0","","","public"
-"org.apache.commons.lang3.text.WordUtils.initials(java.lang.String, char[])","java.lang.String initials(java.lang.String, char[])","{
-    char[] delimiters;
+@return capitalized String, <code>null</code> if null String input","","","0","0","","","public",""
+"org.apache.commons.lang3.text.WordUtils.initials(java.lang.String)","java.lang.String initials(java.lang.String)","{
     java.lang.String str;
-    unknown $stack10, $stack11, $stack12, $stack13, $stack14, $stack15, $stack16, $stack17, $stack18, $stack19, $stack20, $stack21, $stack22, $stack23, $stack24, $stack25, $stack8, $stack9, buf, ch, count, i, lastWasGap, strLen;
+    unknown $stack1;
 
 
     str := @parameter0: java.lang.String;
-    delimiters := @parameter1: char[];
-    $stack8 = staticinvoke <org.apache.commons.lang3.StringUtils: boolean isEmpty(java.lang.CharSequence)>(str);
+    $stack1 = staticinvoke <org.apache.commons.lang3.text.WordUtils: java.lang.String initials(java.lang.String,char[])>(str, null);
 
-    if $stack8 == 0 goto label1;
-
-    return str;
-
-  label1:
-    if delimiters == null goto label2;
-    $stack16 = lengthof delimiters;
-
-    if $stack16 != 0 goto label2;
-
-    return """";
-
-  label2:
-    $stack17 = str;
-    $stack18 = virtualinvoke str.<java.lang.String: int length()>();
-    $stack20 = strLen;
-    $stack19 = 2;
-    $stack9 = $stack20 / $stack19;
-    $stack21 = 1;
-    $stack10 = $stack9 + $stack21;
-    $stack22 = newarray (char)[$stack10];
-    $stack23 = 0;
-    count = $stack23;
-    $stack24 = 1;
-    lastWasGap = $stack24;
-    $stack25 = 0;
-    i = $stack25;
-
-    goto label5;
-
-  label3:
-    if lastWasGap == 0 goto label4;
-    $stack14 = count;
-    count = count + 1;
-    buf[$stack14] = ch;
-    lastWasGap = 0;
-
-  label4:
-    i = i + 1;
-
-  label5:
-    $stack13 = i;
-    $stack12 = strLen;
-
-    if $stack13 < $stack12 goto label6;
-    $stack15 = new java.lang.String;
-    specialinvoke $stack15.<java.lang.String: void <init>(char[],int,int)>(buf, 0, count);
-
-    return $stack15;
-
-  label6:
-    ch = virtualinvoke str.<java.lang.String: char charAt(int)>(i);
-    $stack11 = staticinvoke <org.apache.commons.lang3.text.WordUtils: boolean isDelimiter(char,char[])>(ch, delimiters);
-
-    if $stack11 == 0 goto label3;
-    lastWasGap = 1;
-
-    goto label4;
+    return $stack1;
 }
-","false","PUBLIC STATIC TRANSIENT","","<p>Extracts the initial letters from each word in the String.</p>
+","false","PUBLIC STATIC","","<p>Extracts the initial letters from each word in the String.</p>
 
-<p>The first letter of the string and all first letters after the
-defined delimiters are returned as a new string.
+<p>The first letter of the string and all first letters after
+whitespace are returned as a new string.
 Their case is not changed.</p>
 
-<p>If the delimiters array is null, then Whitespace is used.
-Whitespace is defined by {@link Character#isWhitespace(char)}.
-A <code>null</code> input String returns <code>null</code>.
-An empty delimiter array returns an empty String.</p>
+<p>Whitespace is defined by {@link Character#isWhitespace(char)}.
+A <code>null</code> input String returns <code>null</code>.</p>
 
 <pre>
-WordUtils.initials(null, *)                = null
-WordUtils.initials("""", *)                  = """"
-WordUtils.initials(""Ben John Lee"", null)   = ""BJL""
-WordUtils.initials(""Ben J.Lee"", null)      = ""BJ""
-WordUtils.initials(""Ben J.Lee"", [' ','.']) = ""BJL""
-WordUtils.initials(*, new char[0])         = """"
+WordUtils.initials(null)             = null
+WordUtils.initials("""")               = """"
+WordUtils.initials(""Ben John Lee"")   = ""BJL""
+WordUtils.initials(""Ben J.Lee"")      = ""BJ""
 </pre>
 @param str the String to get initials from, may be null
-@param delimiters set of characters to determine words, null means whitespace
 @return String of initial letters, <code>null</code> if null String input
-@see #initials(String)
-@since 2.2","","","1","4","org.apache.commons.lang3.StringUtils.isEmpty(java.lang.CharSequence), java.lang.String.length(), java.lang.String.charAt(int), org.apache.commons.lang3.text.WordUtils.isDelimiter(char, char[])",""""", 0, 2, 1, true, false","public"
-"org.apache.commons.lang3.concurrent.AtomicInitializer.get()","java.lang.Object get()","{
-    org.apache.commons.lang3.concurrent.AtomicInitializer this;
-    unknown $stack2, $stack3, $stack4, $stack5, $stack6, result;
+@see #initials(String,char[])
+@since 2.2","","","0","0","","","public",""
+"org.apache.commons.lang3.text.translate.CodePointTranslator.translate(java.lang.CharSequence, int, java.io.Writer)","int translate(java.lang.CharSequence, int, java.io.Writer)","{
+    int index;
+    java.io.Writer out;
+    java.lang.CharSequence input;
+    org.apache.commons.lang3.text.translate.CodePointTranslator this;
+    unknown codepoint, consumed;
 
 
-    this := @this: org.apache.commons.lang3.concurrent.AtomicInitializer;
-    $stack2 = this.<org.apache.commons.lang3.concurrent.AtomicInitializer: java.util.concurrent.atomic.AtomicReference reference>;
-    result = virtualinvoke $stack2.<java.util.concurrent.atomic.AtomicReference: java.lang.Object get()>();
+    this := @this: org.apache.commons.lang3.text.translate.CodePointTranslator;
+    input := @parameter0: java.lang.CharSequence;
+    index := @parameter1: int;
+    out := @parameter2: java.io.Writer;
+    codepoint = staticinvoke <java.lang.Character: int codePointAt(java.lang.CharSequence,int)>(input, index);
+    consumed = virtualinvoke this.<org.apache.commons.lang3.text.translate.CodePointTranslator: boolean translate(int,java.io.Writer)>(codepoint, out);
 
-    if result != null goto label1;
-    result = virtualinvoke this.<org.apache.commons.lang3.concurrent.AtomicInitializer: java.lang.Object initialize()>();
-    $stack3 = this.<org.apache.commons.lang3.concurrent.AtomicInitializer: java.util.concurrent.atomic.AtomicReference reference>;
-    $stack4 = virtualinvoke $stack3.<java.util.concurrent.atomic.AtomicReference: boolean compareAndSet(java.lang.Object,java.lang.Object)>(null, result);
+    if consumed == 0 goto label1;
 
-    if $stack4 != 0 goto label1;
-    $stack6 = this.<org.apache.commons.lang3.concurrent.AtomicInitializer: java.util.concurrent.atomic.AtomicReference reference>;
-    result = virtualinvoke $stack6.<java.util.concurrent.atomic.AtomicReference: java.lang.Object get()>();
-
-  label1:
-    $stack5 = result;
-
-    return $stack5;
-}
-","false","PUBLIC","Override","Returns the object managed by this initializer. The object is created if
-it is not available yet and stored internally. This method always returns
-the same object.
-@return the object created by this {@code AtomicInitializer}
-@throws ConcurrentException if an error occurred during initialization of
-the object","implements org.apache.commons.lang3.concurrent.ConcurrentInitializer","PRIVATE FINAL java.util.concurrent.atomic.AtomicReference reference","0","2","java.util.concurrent.atomic.AtomicReference.get(), org.apache.commons.lang3.concurrent.AtomicInitializer.initialize(), java.util.concurrent.atomic.AtomicReference.compareAndSet(V, V)","","public"
-"org.apache.commons.lang3.CharSetUtils.count(java.lang.String, java.lang.String[])","int count(java.lang.String, java.lang.String[])","{
-    java.lang.String str;
-    java.lang.String[] set;
-    unknown $stack10, $stack11, $stack12, $stack13, $stack14, $stack8, $stack9, c, chars, count, l5, l6, l7;
-
-
-    str := @parameter0: java.lang.String;
-    set := @parameter1: java.lang.String[];
-    $stack8 = staticinvoke <org.apache.commons.lang3.StringUtils: boolean isEmpty(java.lang.CharSequence)>(str);
-
-    if $stack8 != 0 goto label1;
-    $stack9 = staticinvoke <org.apache.commons.lang3.CharSetUtils: boolean deepEmpty(java.lang.String[])>(set);
-
-    if $stack9 == 0 goto label2;
+    return 1;
 
   label1:
-    $stack14 = 0;
-
-    return $stack14;
-
-  label2:
-    chars = staticinvoke <org.apache.commons.lang3.CharSet: org.apache.commons.lang3.CharSet getInstance(java.lang.String[])>(set);
-    count = 0;
-    $stack10 = virtualinvoke str.<java.lang.String: char[] toCharArray()>();
-    l7 = $stack10;
-    l6 = lengthof $stack10;
-    l5 = 0;
-
-    goto label5;
-
-  label3:
-    c = l7[l5];
-    $stack11 = virtualinvoke chars.<org.apache.commons.lang3.CharSet: boolean contains(char)>(c);
-
-    if $stack11 == 0 goto label4;
-    count = count + 1;
-
-  label4:
-    l5 = l5 + 1;
-
-  label5:
-    $stack13 = l5;
-    $stack12 = l6;
-
-    if $stack13 < $stack12 goto label3;
-
-    return count;
-}
-","false","PUBLIC STATIC TRANSIENT","","<p>Takes an argument in set-syntax, see evaluateSet,
-and returns the number of characters present in the specified string.</p>
-
-<pre>
-CharSetUtils.count(null, *)        = 0
-CharSetUtils.count("""", *)          = 0
-CharSetUtils.count(*, null)        = 0
-CharSetUtils.count(*, """")          = 0
-CharSetUtils.count(""hello"", ""k-p"") = 3
-CharSetUtils.count(""hello"", ""a-e"") = 1
-</pre>
-@see CharSet#getInstance(java.lang.String...) for set-syntax.
-@param str String to count characters in, may be null
-@param set String[] set of characters to count, may be null
-@return the character count, zero if null string input","","","0","2","org.apache.commons.lang3.StringUtils.isEmpty(java.lang.CharSequence), org.apache.commons.lang3.CharSetUtils.deepEmpty(java.lang.String[]), org.apache.commons.lang3.CharSet.getInstance(java.lang.String...), java.lang.String.toCharArray(), org.apache.commons.lang3.CharSet.contains(char)","0","public"
-"org.apache.commons.lang3.CharSetUtils.deepEmpty(java.lang.String[])","boolean deepEmpty(java.lang.String[])","{
-    java.lang.String[] strings;
-    unknown $stack5, $stack6, $stack7, $stack8, l2, l3, l4, s;
-
-
-    strings := @parameter0: java.lang.String[];
-
-    if strings == null goto label3;
-    l4 = strings;
-    l3 = lengthof strings;
-    l2 = 0;
-
-    goto label2;
-
-  label1:
-    l2 = l2 + 1;
-
-  label2:
-    $stack7 = l2;
-    $stack6 = l3;
-
-    if $stack7 < $stack6 goto label4;
-
-  label3:
-    $stack8 = 1;
-
-    return $stack8;
-
-  label4:
-    s = l4[l2];
-    $stack5 = staticinvoke <org.apache.commons.lang3.StringUtils: boolean isNotEmpty(java.lang.CharSequence)>(s);
-
-    if $stack5 == 0 goto label1;
-
     return 0;
 }
-","false","PRIVATE STATIC","","Determines whether or not all the Strings in an array are 
-empty or not.
-@param strings String[] whose elements are being checked for emptiness
-@return whether or not the String is empty","","","0","2","org.apache.commons.lang3.StringUtils.isNotEmpty(java.lang.CharSequence)","false, true","public"
-"org.apache.commons.lang3.CharSetUtils.squeeze(java.lang.String, java.lang.String[])","java.lang.String squeeze(java.lang.String, java.lang.String[])","{
-    java.lang.String str;
-    java.lang.String[] set;
-    unknown $stack10, $stack11, $stack12, $stack13, $stack14, $stack15, $stack16, $stack17, $stack18, $stack19, $stack20, $stack21, $stack9, buffer, ch, chars, chrs, i, lastChar, sz;
-
-
-    str := @parameter0: java.lang.String;
-    set := @parameter1: java.lang.String[];
-    $stack9 = staticinvoke <org.apache.commons.lang3.StringUtils: boolean isEmpty(java.lang.CharSequence)>(str);
-
-    if $stack9 != 0 goto label1;
-    $stack10 = staticinvoke <org.apache.commons.lang3.CharSetUtils: boolean deepEmpty(java.lang.String[])>(set);
-
-    if $stack10 == 0 goto label2;
-
-  label1:
-    $stack21 = str;
-
-    return $stack21;
-
-  label2:
-    chars = staticinvoke <org.apache.commons.lang3.CharSet: org.apache.commons.lang3.CharSet getInstance(java.lang.String[])>(set);
-    $stack11 = new java.lang.StringBuilder;
-    $stack12 = virtualinvoke str.<java.lang.String: int length()>();
-    specialinvoke $stack11.<java.lang.StringBuilder: void <init>(int)>($stack12);
-    buffer = $stack11;
-    chrs = virtualinvoke str.<java.lang.String: char[] toCharArray()>();
-    sz = lengthof chrs;
-    lastChar = 32;
-    ch = 32;
-    i = 0;
-
-    goto label5;
-
-  label3:
-    $stack17 = buffer;
-    $stack16 = ch;
-    $stack13 = virtualinvoke $stack17.<java.lang.StringBuilder: java.lang.StringBuilder append(char)>($stack16);
-    $stack18 = ch;
-    lastChar = $stack18;
-
-  label4:
-    i = i + 1;
-
-  label5:
-    $stack15 = i;
-    $stack14 = sz;
-
-    if $stack15 < $stack14 goto label6;
-    $stack20 = virtualinvoke buffer.<java.lang.StringBuilder: java.lang.String toString()>();
-
-    return $stack20;
-
-  label6:
-    ch = chrs[i];
-
-    if ch != lastChar goto label3;
-
-    if i == 0 goto label3;
-    $stack19 = virtualinvoke chars.<org.apache.commons.lang3.CharSet: boolean contains(char)>(ch);
-
-    if $stack19 == 0 goto label3;
-
-    goto label4;
-}
-","false","PUBLIC STATIC TRANSIENT","","<p>Squeezes any repetitions of a character that is mentioned in the
-supplied set.</p>
-
-<pre>
-CharSetUtils.squeeze(null, *)        = null
-CharSetUtils.squeeze("""", *)          = """"
-CharSetUtils.squeeze(*, null)        = *
-CharSetUtils.squeeze(*, """")          = *
-CharSetUtils.squeeze(""hello"", ""k-p"") = ""helo""
-CharSetUtils.squeeze(""hello"", ""a-e"") = ""hello""
-</pre>
-@see CharSet#getInstance(java.lang.String...) for set-syntax.
-@param str the string to squeeze, may be null
-@param set the character set to use for manipulation, may be null
-@return the modified String, {@code null} if null string input","","","1","2","org.apache.commons.lang3.StringUtils.isEmpty(java.lang.CharSequence), org.apache.commons.lang3.CharSetUtils.deepEmpty(java.lang.String[]), org.apache.commons.lang3.CharSet.getInstance(java.lang.String...), java.lang.String.length(), java.lang.String.toCharArray(), org.apache.commons.lang3.CharSet.contains(char), java.lang.StringBuilder.append(char), java.lang.StringBuilder.toString()","' ', 0","public"
-"org.apache.commons.lang3.CharSetUtils.CharSetUtils()","void CharSetUtils()","{
-    org.apache.commons.lang3.CharSetUtils this;
-
-
-    this := @this: org.apache.commons.lang3.CharSetUtils;
-    specialinvoke this.<java.lang.Object: void <init>()>();
-
-    return;
-}
-","true","PUBLIC","","<p>CharSetUtils instances should NOT be constructed in standard programming.
-Instead, the class should be used as {@code CharSetUtils.evaluateSet(null);}.</p>
-
-<p>This constructor is public to permit tools that require a JavaBean instance
-to operate.</p>","","","0","0","","","public"
-"org.apache.commons.lang3.CharSetUtils.modify(java.lang.String, java.lang.String[], boolean)","java.lang.String modify(java.lang.String, java.lang.String[], boolean)","{
-    boolean expect;
-    java.lang.String str;
-    java.lang.String[] set;
-    unknown $stack10, $stack11, $stack12, $stack13, $stack14, $stack15, $stack16, $stack8, $stack9, buffer, chars, chrs, i, sz;
-
-
-    str := @parameter0: java.lang.String;
-    set := @parameter1: java.lang.String[];
-    expect := @parameter2: boolean;
-    chars = staticinvoke <org.apache.commons.lang3.CharSet: org.apache.commons.lang3.CharSet getInstance(java.lang.String[])>(set);
-    $stack8 = new java.lang.StringBuilder;
-    $stack9 = virtualinvoke str.<java.lang.String: int length()>();
-    specialinvoke $stack8.<java.lang.StringBuilder: void <init>(int)>($stack9);
-    buffer = $stack8;
-    chrs = virtualinvoke str.<java.lang.String: char[] toCharArray()>();
-    sz = lengthof chrs;
-    i = 0;
-
-    goto label3;
-
-  label1:
-    $stack10 = chrs[i];
-    $stack11 = virtualinvoke chars.<org.apache.commons.lang3.CharSet: boolean contains(char)>($stack10);
-
-    if $stack11 != expect goto label2;
-    $stack14 = chrs[i];
-    $stack15 = virtualinvoke buffer.<java.lang.StringBuilder: java.lang.StringBuilder append(char)>($stack14);
-
-  label2:
-    i = i + 1;
-
-  label3:
-    $stack13 = i;
-    $stack12 = sz;
-
-    if $stack13 < $stack12 goto label1;
-    $stack16 = virtualinvoke buffer.<java.lang.StringBuilder: java.lang.String toString()>();
-
-    return $stack16;
-}
-","false","PRIVATE STATIC","","Implementation of delete and keep
-@param str String to modify characters within
-@param set String[] set of characters to modify
-@param expect whether to evaluate on match, or non-match
-@return the modified String, not null","","","1","1","org.apache.commons.lang3.CharSet.getInstance(java.lang.String...), java.lang.String.length(), java.lang.String.toCharArray(), org.apache.commons.lang3.CharSet.contains(char), java.lang.StringBuilder.append(char), java.lang.StringBuilder.toString()","0","public"
-"org.apache.commons.lang3.CharSetUtils.delete(java.lang.String, java.lang.String[])","java.lang.String delete(java.lang.String, java.lang.String[])","{
-    java.lang.String str;
-    java.lang.String[] set;
-    unknown $stack2, $stack3, $stack4, $stack5;
-
-
-    str := @parameter0: java.lang.String;
-    set := @parameter1: java.lang.String[];
-    $stack2 = staticinvoke <org.apache.commons.lang3.StringUtils: boolean isEmpty(java.lang.CharSequence)>(str);
-
-    if $stack2 != 0 goto label1;
-    $stack3 = staticinvoke <org.apache.commons.lang3.CharSetUtils: boolean deepEmpty(java.lang.String[])>(set);
-
-    if $stack3 == 0 goto label2;
-
-  label1:
-    $stack5 = str;
-
-    return $stack5;
-
-  label2:
-    $stack4 = staticinvoke <org.apache.commons.lang3.CharSetUtils: java.lang.String modify(java.lang.String,java.lang.String[],boolean)>(str, set, 0);
-
-    return $stack4;
-}
-","false","PUBLIC STATIC TRANSIENT","","<p>Takes an argument in set-syntax, see evaluateSet,
-and deletes any of characters present in the specified string.</p>
-
-<pre>
-CharSetUtils.delete(null, *)        = null
-CharSetUtils.delete("""", *)          = """"
-CharSetUtils.delete(*, null)        = *
-CharSetUtils.delete(*, """")          = *
-CharSetUtils.delete(""hello"", ""hl"")  = ""eo""
-CharSetUtils.delete(""hello"", ""le"")  = ""ho""
-</pre>
-@see CharSet#getInstance(java.lang.String...) for set-syntax.
-@param str String to delete characters from, may be null
-@param set String[] set of characters to delete, may be null
-@return the modified String, {@code null} if null string input","","","0","1","org.apache.commons.lang3.StringUtils.isEmpty(java.lang.CharSequence), org.apache.commons.lang3.CharSetUtils.deepEmpty(java.lang.String[]), org.apache.commons.lang3.CharSetUtils.modify(java.lang.String, java.lang.String[], boolean)","false","public"
-"org.apache.commons.lang3.CharSetUtils.containsAny(java.lang.String, java.lang.String[])","boolean containsAny(java.lang.String, java.lang.String[])","{
-    java.lang.String str;
-    java.lang.String[] set;
-    unknown $stack10, $stack11, $stack12, $stack13, $stack7, $stack8, $stack9, c, chars, l4, l5, l6;
-
-
-    str := @parameter0: java.lang.String;
-    set := @parameter1: java.lang.String[];
-    $stack7 = staticinvoke <org.apache.commons.lang3.StringUtils: boolean isEmpty(java.lang.CharSequence)>(str);
-
-    if $stack7 != 0 goto label1;
-    $stack8 = staticinvoke <org.apache.commons.lang3.CharSetUtils: boolean deepEmpty(java.lang.String[])>(set);
-
-    if $stack8 == 0 goto label2;
-
-  label1:
-    $stack13 = 0;
-
-    return $stack13;
-
-  label2:
-    chars = staticinvoke <org.apache.commons.lang3.CharSet: org.apache.commons.lang3.CharSet getInstance(java.lang.String[])>(set);
-    $stack9 = virtualinvoke str.<java.lang.String: char[] toCharArray()>();
-    l6 = $stack9;
-    l5 = lengthof $stack9;
-    l4 = 0;
-
-    goto label4;
-
-  label3:
-    l4 = l4 + 1;
-
-  label4:
-    $stack12 = l4;
-    $stack11 = l5;
-
-    if $stack12 < $stack11 goto label5;
-
-    return 0;
-
-  label5:
-    c = l6[l4];
-    $stack10 = virtualinvoke chars.<org.apache.commons.lang3.CharSet: boolean contains(char)>(c);
-
-    if $stack10 == 0 goto label3;
-
-    return 1;
-}
-","false","PUBLIC STATIC TRANSIENT","","<p>Takes an argument in set-syntax, see evaluateSet,
-and identifies whether any of the characters are present in the specified string.</p>
-
-<pre>
-CharSetUtils.containsAny(null, *)        = false
-CharSetUtils.containsAny("""", *)          = false
-CharSetUtils.containsAny(*, null)        = false
-CharSetUtils.containsAny(*, """")          = false
-CharSetUtils.containsAny(""hello"", ""k-p"") = true
-CharSetUtils.containsAny(""hello"", ""a-d"") = false
-</pre>
-@see CharSet#getInstance(java.lang.String...) for set-syntax.
-@param str String to look for characters in, may be null
-@param set String[] set of characters to identify, may be null
-@return whether or not the characters in the set are in the primary string","","","0","2","org.apache.commons.lang3.StringUtils.isEmpty(java.lang.CharSequence), org.apache.commons.lang3.CharSetUtils.deepEmpty(java.lang.String[]), org.apache.commons.lang3.CharSet.getInstance(java.lang.String...), java.lang.String.toCharArray(), org.apache.commons.lang3.CharSet.contains(char)","false, true","public"
-"org.apache.commons.lang3.CharSetUtils.keep(java.lang.String, java.lang.String[])","java.lang.String keep(java.lang.String, java.lang.String[])","{
-    java.lang.String str;
-    java.lang.String[] set;
-    unknown $stack2, $stack3, $stack4, $stack5;
-
-
-    str := @parameter0: java.lang.String;
-    set := @parameter1: java.lang.String[];
-
-    if str != null goto label1;
-
-    return null;
-
-  label1:
-    $stack2 = virtualinvoke str.<java.lang.String: boolean isEmpty()>();
-
-    if $stack2 != 0 goto label2;
-    $stack3 = staticinvoke <org.apache.commons.lang3.CharSetUtils: boolean deepEmpty(java.lang.String[])>(set);
-
-    if $stack3 == 0 goto label3;
-
-  label2:
-    $stack5 = """";
-
-    return $stack5;
-
-  label3:
-    $stack4 = staticinvoke <org.apache.commons.lang3.CharSetUtils: java.lang.String modify(java.lang.String,java.lang.String[],boolean)>(str, set, 1);
-
-    return $stack4;
-}
-","false","PUBLIC STATIC TRANSIENT","","<p>Takes an argument in set-syntax, see evaluateSet,
-and keeps any of characters present in the specified string.</p>
-
-<pre>
-CharSetUtils.keep(null, *)        = null
-CharSetUtils.keep("""", *)          = """"
-CharSetUtils.keep(*, null)        = """"
-CharSetUtils.keep(*, """")          = """"
-CharSetUtils.keep(""hello"", ""hl"")  = ""hll""
-CharSetUtils.keep(""hello"", ""le"")  = ""ell""
-</pre>
-@see CharSet#getInstance(java.lang.String...) for set-syntax.
-@param str String to keep characters from, may be null
-@param set String[] set of characters to keep, may be null
-@return the modified String, {@code null} if null string input
-@since 2.0","","","0","2","java.lang.String.isEmpty(), org.apache.commons.lang3.CharSetUtils.deepEmpty(java.lang.String[]), org.apache.commons.lang3.CharSetUtils.modify(java.lang.String, java.lang.String[], boolean)","true","public"
-"org.apache.commons.lang3.CharRange.isNotIn(char, char)","org.apache.commons.lang3.CharRange isNotIn(char, char)","{
-    char end, start;
-    unknown $stack2;
-
-
-    start := @parameter0: char;
-    end := @parameter1: char;
-    $stack2 = new org.apache.commons.lang3.CharRange;
-    specialinvoke $stack2.<org.apache.commons.lang3.CharRange: void <init>(char,char,boolean)>(start, end, 1);
-
-    return $stack2;
-}
-","false","PUBLIC STATIC","","<p>Constructs a negated {@code CharRange} over a set of characters.</p>
-@param start first character, inclusive, in this range
-@param end last character, inclusive, in this range
-@return the new CharRange object
-@see CharRange#CharRange(char, char, boolean)
-@since 2.5","implements java.io.Serializable, java.lang.Iterable","PRIVATE TRANSIENT java.lang.String iToString; PRIVATE FINAL char start; PRIVATE FINAL boolean negated; PRIVATE FINAL char end; PRIVATE STATIC FINAL long serialVersionUID","0","0","","true","private"
-"org.apache.commons.lang3.CharRange.contains(char)","boolean contains(char)","{
-    char ch;
-    org.apache.commons.lang3.CharRange this;
-    unknown $stack2, $stack3, $stack4, $stack5, $stack6, $stack7;
-
-
-    this := @this: org.apache.commons.lang3.CharRange;
-    ch := @parameter0: char;
-    $stack2 = this.<org.apache.commons.lang3.CharRange: char start>;
-
-    if ch < $stack2 goto label1;
-    $stack5 = this.<org.apache.commons.lang3.CharRange: char end>;
-
-    if ch > $stack5 goto label1;
-    $stack7 = 1;
-
-    goto label2;
-
-  label1:
-    $stack7 = 0;
-
-  label2:
-    $stack6 = this;
-    $stack3 = this.<org.apache.commons.lang3.CharRange: boolean negated>;
-    $stack4 = $stack7 ^ $stack3;
-
-    return $stack4;
-}
-","false","PUBLIC","","<p>Is the character specified contained in this range.</p>
-@param ch the character to check
-@return {@code true} if this range contains the input character","implements java.io.Serializable, java.lang.Iterable","PRIVATE TRANSIENT java.lang.String iToString; PRIVATE FINAL char start; PRIVATE FINAL boolean negated; PRIVATE FINAL char end; PRIVATE STATIC FINAL long serialVersionUID","0","0","","","private"
-"org.apache.commons.lang3.CharRange.isNegated()","boolean isNegated()","{
-    org.apache.commons.lang3.CharRange this;
-    unknown $stack1;
-
-
-    this := @this: org.apache.commons.lang3.CharRange;
-    $stack1 = this.<org.apache.commons.lang3.CharRange: boolean negated>;
-
-    return $stack1;
-}
-","false","PUBLIC","","<p>Is this {@code CharRange} negated.</p>
-
-<p>A negated range includes everything except that defined by the
-start and end characters.</p>
-@return {@code true} if negated","implements java.io.Serializable, java.lang.Iterable","PRIVATE TRANSIENT java.lang.String iToString; PRIVATE FINAL char start; PRIVATE FINAL boolean negated; PRIVATE FINAL char end; PRIVATE STATIC FINAL long serialVersionUID","0","0","","","private"
-"org.apache.commons.lang3.CharRange.isIn(char, char)","org.apache.commons.lang3.CharRange isIn(char, char)","{
-    char end, start;
-    unknown $stack2;
-
-
-    start := @parameter0: char;
-    end := @parameter1: char;
-    $stack2 = new org.apache.commons.lang3.CharRange;
-    specialinvoke $stack2.<org.apache.commons.lang3.CharRange: void <init>(char,char,boolean)>(start, end, 0);
-
-    return $stack2;
-}
-","false","PUBLIC STATIC","","<p>Constructs a {@code CharRange} over a set of characters.</p>
-@param start first character, inclusive, in this range
-@param end last character, inclusive, in this range
-@return the new CharRange object
-@see CharRange#CharRange(char, char, boolean)
-@since 2.5","implements java.io.Serializable, java.lang.Iterable","PRIVATE TRANSIENT java.lang.String iToString; PRIVATE FINAL char start; PRIVATE FINAL boolean negated; PRIVATE FINAL char end; PRIVATE STATIC FINAL long serialVersionUID","0","0","","false","private"
-"org.apache.commons.lang3.CharRange.contains(org.apache.commons.lang3.CharRange)","boolean contains(org.apache.commons.lang3.CharRange)","{
-    org.apache.commons.lang3.CharRange range, this;
-    unknown $stack10, $stack11, $stack12, $stack13, $stack14, $stack15, $stack16, $stack17, $stack18, $stack19, $stack2, $stack20, $stack21, $stack22, $stack23, $stack3, $stack4, $stack5, $stack6, $stack7, $stack8, $stack9;
-
-
-    this := @this: org.apache.commons.lang3.CharRange;
-    range := @parameter0: org.apache.commons.lang3.CharRange;
-
-    if range != null goto label1;
-    $stack23 = new java.lang.IllegalArgumentException;
-    specialinvoke $stack23.<java.lang.IllegalArgumentException: void <init>(java.lang.String)>(""The Range must not be null"");
-
-    throw $stack23;
-
-  label1:
-    $stack2 = this.<org.apache.commons.lang3.CharRange: boolean negated>;
-
-    if $stack2 == 0 goto label3;
-    $stack12 = range.<org.apache.commons.lang3.CharRange: boolean negated>;
-
-    if $stack12 == 0 goto label2;
-    $stack19 = this.<org.apache.commons.lang3.CharRange: char start>;
-    $stack18 = range.<org.apache.commons.lang3.CharRange: char start>;
-
-    if $stack19 < $stack18 goto label5;
-    $stack21 = this.<org.apache.commons.lang3.CharRange: char end>;
-    $stack20 = range.<org.apache.commons.lang3.CharRange: char end>;
-
-    if $stack21 > $stack20 goto label5;
-
-    return 1;
-
-  label2:
-    $stack14 = range.<org.apache.commons.lang3.CharRange: char end>;
-    $stack13 = this.<org.apache.commons.lang3.CharRange: char start>;
-
-    if $stack14 < $stack13 goto label6;
-    $stack16 = range.<org.apache.commons.lang3.CharRange: char start>;
-    $stack15 = this.<org.apache.commons.lang3.CharRange: char end>;
-
-    if $stack16 > $stack15 goto label6;
-
-    return 0;
-
-  label3:
-    $stack3 = range.<org.apache.commons.lang3.CharRange: boolean negated>;
-
-    if $stack3 == 0 goto label4;
-    $stack9 = this.<org.apache.commons.lang3.CharRange: char start>;
-
-    if $stack9 != 0 goto label7;
-    $stack10 = this.<org.apache.commons.lang3.CharRange: char end>;
-
-    if $stack10 != 65535 goto label7;
-
-    return 1;
-
-  label4:
-    $stack5 = this.<org.apache.commons.lang3.CharRange: char start>;
-    $stack4 = range.<org.apache.commons.lang3.CharRange: char start>;
-
-    if $stack5 > $stack4 goto label8;
-    $stack7 = this.<org.apache.commons.lang3.CharRange: char end>;
-    $stack6 = range.<org.apache.commons.lang3.CharRange: char end>;
-
-    if $stack7 < $stack6 goto label8;
-
-    return 1;
-
-  label5:
-    $stack22 = 0;
-
-    return $stack22;
-
-  label6:
-    $stack17 = 1;
-
-    return $stack17;
-
-  label7:
-    $stack11 = 0;
-
-    return $stack11;
-
-  label8:
-    $stack8 = 0;
-
-    return $stack8;
-}
-","false","PUBLIC","","<p>Is the character specified contained in this range.</p>
-@param ch the character to check
-@return {@code true} if this range contains the input character","implements java.io.Serializable, java.lang.Iterable","PRIVATE TRANSIENT java.lang.String iToString; PRIVATE FINAL char start; PRIVATE FINAL boolean negated; PRIVATE FINAL char end; PRIVATE STATIC FINAL long serialVersionUID","0","0","","","private"
-"org.apache.commons.lang3.CharRange.equals(java.lang.Object)","boolean equals(java.lang.Object)","{
-    java.lang.Object obj;
-    org.apache.commons.lang3.CharRange this;
-    unknown $stack10, $stack3, $stack4, $stack5, $stack6, $stack7, $stack8, $stack9, other;
-
-
-    this := @this: org.apache.commons.lang3.CharRange;
-    obj := @parameter0: java.lang.Object;
-
-    if obj != this goto label1;
-
-    return 1;
-
-  label1:
-    $stack3 = obj instanceof org.apache.commons.lang3.CharRange;
-
-    if $stack3 != 0 goto label2;
-
-    return 0;
-
-  label2:
-    other = (org.apache.commons.lang3.CharRange) obj;
-    $stack5 = this.<org.apache.commons.lang3.CharRange: char start>;
-    $stack4 = other.<org.apache.commons.lang3.CharRange: char start>;
-
-    if $stack5 != $stack4 goto label3;
-    $stack7 = this.<org.apache.commons.lang3.CharRange: char end>;
-    $stack6 = other.<org.apache.commons.lang3.CharRange: char end>;
-
-    if $stack7 != $stack6 goto label3;
-    $stack10 = this.<org.apache.commons.lang3.CharRange: boolean negated>;
-    $stack9 = other.<org.apache.commons.lang3.CharRange: boolean negated>;
-
-    if $stack10 != $stack9 goto label3;
-
-    return 1;
-
-  label3:
-    $stack8 = 0;
-
-    return $stack8;
-}
-","false","PUBLIC","Override","<p>Compares two CharRange objects, returning true if they represent
-exactly the same range of characters defined in the same way.</p>
-@param obj the object to compare to
-@return true if equal","implements java.io.Serializable, java.lang.Iterable","PRIVATE TRANSIENT java.lang.String iToString; PRIVATE FINAL char start; PRIVATE FINAL boolean negated; PRIVATE FINAL char end; PRIVATE STATIC FINAL long serialVersionUID","0","2","","true, false","private"
-"org.apache.commons.lang3.CharRange.iterator()","java.util.Iterator iterator()","{
-    org.apache.commons.lang3.CharRange this;
-    unknown $stack1;
-
-
-    this := @this: org.apache.commons.lang3.CharRange;
-    $stack1 = new org.apache.commons.lang3.CharRange$CharacterIterator;
-    specialinvoke $stack1.<org.apache.commons.lang3.CharRange$CharacterIterator: void <init>(org.apache.commons.lang3.CharRange,org.apache.commons.lang3.CharRange$CharacterIterator)>(this, null);
-
-    return $stack1;
-}
-","false","PUBLIC","Override","<p>Returns an iterator which can be used to walk through the characters described by this range.</p>
-
-<p>#NotThreadSafe# the iterator is not thread-safe</p>
-@return an iterator to the chars represented by this range
-@since 2.5","implements java.io.Serializable, java.lang.Iterable","PRIVATE TRANSIENT java.lang.String iToString; PRIVATE FINAL char start; PRIVATE FINAL boolean negated; PRIVATE FINAL char end; PRIVATE STATIC FINAL long serialVersionUID","0","0","","","private"
-"org.apache.commons.lang3.CharRange.hashCode()","int hashCode()","{
-    org.apache.commons.lang3.CharRange this;
-    unknown $stack1, $stack2, $stack3, $stack4, $stack5, $stack6, $stack7, $stack8;
-
-
-    this := @this: org.apache.commons.lang3.CharRange;
-    $stack1 = this.<org.apache.commons.lang3.CharRange: char start>;
-    $stack4 = 83 + $stack1;
-    $stack2 = this.<org.apache.commons.lang3.CharRange: char end>;
-    $stack3 = 7 * $stack2;
-    $stack6 = $stack4 + $stack3;
-    $stack5 = this.<org.apache.commons.lang3.CharRange: boolean negated>;
-
-    if $stack5 == 0 goto label1;
-    $stack8 = 1;
-
-    goto label2;
-
-  label1:
-    $stack8 = 0;
-
-  label2:
-    $stack7 = $stack6 + $stack8;
-
-    return $stack7;
-}
-","false","PUBLIC","Override","<p>Gets a hashCode compatible with the equals method.</p>
-@return a suitable hashCode","implements java.io.Serializable, java.lang.Iterable","PRIVATE TRANSIENT java.lang.String iToString; PRIVATE FINAL char start; PRIVATE FINAL boolean negated; PRIVATE FINAL char end; PRIVATE STATIC FINAL long serialVersionUID","0","0","","83, 7, 1, 0","private"
-"org.apache.commons.lang3.CharRange.CharRange(char, char, boolean)","void CharRange(char, char, boolean)","{
-    boolean negated;
-    char end, start;
-    org.apache.commons.lang3.CharRange this;
-    unknown $stack10, $stack5, $stack6, $stack7, $stack8, $stack9, temp;
-
-
-    this := @this: org.apache.commons.lang3.CharRange;
-    start := @parameter0: char;
-    end := @parameter1: char;
-    negated := @parameter2: boolean;
-    specialinvoke this.<java.lang.Object: void <init>()>();
-
-    if start <= end goto label1;
-    temp = start;
-    start = end;
-    end = temp;
-
-  label1:
-    $stack6 = this;
-    $stack5 = start;
-    this.<org.apache.commons.lang3.CharRange: char start> = $stack5;
-    $stack8 = this;
-    $stack7 = end;
-    this.<org.apache.commons.lang3.CharRange: char end> = $stack7;
-    $stack10 = this;
-    $stack9 = negated;
-    this.<org.apache.commons.lang3.CharRange: boolean negated> = $stack9;
-
-    return;
-}
-","true","PRIVATE","","<p>Constructs a {@code CharRange} over a set of characters,
-optionally negating the range.</p>
-
-<p>A negated range includes everything except that defined by the
-start and end characters.</p>
-
-<p>If start and end are in the wrong order, they are reversed.
-Thus {@code a-e} is the same as {@code e-a}.</p>
-@param start first character, inclusive, in this range
-@param end last character, inclusive, in this range
-@param negated true to express everything except the range","implements java.io.Serializable, java.lang.Iterable","PRIVATE TRANSIENT java.lang.String iToString; PRIVATE FINAL char start; PRIVATE FINAL boolean negated; PRIVATE FINAL char end; PRIVATE STATIC FINAL long serialVersionUID","0","1","","","private"
-"org.apache.commons.lang3.CharRange.isNot(char)","org.apache.commons.lang3.CharRange isNot(char)","{
-    char ch;
-    unknown $stack1;
-
-
-    ch := @parameter0: char;
-    $stack1 = new org.apache.commons.lang3.CharRange;
-    specialinvoke $stack1.<org.apache.commons.lang3.CharRange: void <init>(char,char,boolean)>(ch, ch, 1);
-
-    return $stack1;
-}
-","false","PUBLIC STATIC","","<p>Constructs a negated {@code CharRange} over a single character.</p>
-@param ch only character in this range
-@return the new CharRange object
-@see CharRange#CharRange(char, char, boolean)
-@since 2.5","implements java.io.Serializable, java.lang.Iterable","PRIVATE TRANSIENT java.lang.String iToString; PRIVATE FINAL char start; PRIVATE FINAL boolean negated; PRIVATE FINAL char end; PRIVATE STATIC FINAL long serialVersionUID","0","0","","true","private"
-"org.apache.commons.lang3.CharRange.getEnd()","char getEnd()","{
-    org.apache.commons.lang3.CharRange this;
-    unknown $stack1;
-
-
-    this := @this: org.apache.commons.lang3.CharRange;
-    $stack1 = this.<org.apache.commons.lang3.CharRange: char end>;
-
-    return $stack1;
-}
-","false","PUBLIC","","<p>Gets the end character for this character range.</p>
-@return the end char (inclusive)","implements java.io.Serializable, java.lang.Iterable","PRIVATE TRANSIENT java.lang.String iToString; PRIVATE FINAL char start; PRIVATE FINAL boolean negated; PRIVATE FINAL char end; PRIVATE STATIC FINAL long serialVersionUID","0","0","","","private"
-"org.apache.commons.lang3.CharRange.is(char)","org.apache.commons.lang3.CharRange is(char)","{
-    char ch;
-    unknown $stack1;
-
-
-    ch := @parameter0: char;
-    $stack1 = new org.apache.commons.lang3.CharRange;
-    specialinvoke $stack1.<org.apache.commons.lang3.CharRange: void <init>(char,char,boolean)>(ch, ch, 0);
-
-    return $stack1;
-}
-","false","PUBLIC STATIC","","<p>Constructs a {@code CharRange} over a single character.</p>
-@param ch only character in this range
-@return the new CharRange object
-@see CharRange#CharRange(char, char, boolean)
-@since 2.5","implements java.io.Serializable, java.lang.Iterable","PRIVATE TRANSIENT java.lang.String iToString; PRIVATE FINAL char start; PRIVATE FINAL boolean negated; PRIVATE FINAL char end; PRIVATE STATIC FINAL long serialVersionUID","0","0","","false","private"
-"org.apache.commons.lang3.CharRange.getStart()","char getStart()","{
-    org.apache.commons.lang3.CharRange this;
-    unknown $stack1;
-
-
-    this := @this: org.apache.commons.lang3.CharRange;
-    $stack1 = this.<org.apache.commons.lang3.CharRange: char start>;
-
-    return $stack1;
-}
-","false","PUBLIC","","<p>Gets the start character for this character range.</p>
-@return the start char (inclusive)","implements java.io.Serializable, java.lang.Iterable","PRIVATE TRANSIENT java.lang.String iToString; PRIVATE FINAL char start; PRIVATE FINAL boolean negated; PRIVATE FINAL char end; PRIVATE STATIC FINAL long serialVersionUID","0","0","","","private"
-"org.apache.commons.lang3.CharRange.toString()","java.lang.String toString()","{
-    org.apache.commons.lang3.CharRange this;
-    unknown $stack10, $stack11, $stack12, $stack13, $stack14, $stack15, $stack16, $stack17, $stack18, $stack19, $stack2, $stack20, $stack21, $stack3, $stack4, $stack5, $stack6, $stack7, $stack8, $stack9, buf;
-
-
-    this := @this: org.apache.commons.lang3.CharRange;
-    $stack2 = this.<org.apache.commons.lang3.CharRange: java.lang.String iToString>;
-
-    if $stack2 != null goto label3;
-    $stack4 = new java.lang.StringBuilder;
-    specialinvoke $stack4.<java.lang.StringBuilder: void <init>(int)>(4);
-    buf = $stack4;
-    $stack5 = virtualinvoke this.<org.apache.commons.lang3.CharRange: boolean isNegated()>();
-
-    if $stack5 == 0 goto label1;
-    $stack17 = virtualinvoke buf.<java.lang.StringBuilder: java.lang.StringBuilder append(char)>(94);
-
-  label1:
-    $stack19 = buf;
-    $stack18 = this;
-    $stack6 = this.<org.apache.commons.lang3.CharRange: char start>;
-    $stack7 = virtualinvoke $stack19.<java.lang.StringBuilder: java.lang.StringBuilder append(char)>($stack6);
-    $stack20 = this;
-    $stack9 = this.<org.apache.commons.lang3.CharRange: char start>;
-    $stack21 = this;
-    $stack8 = this.<org.apache.commons.lang3.CharRange: char end>;
-
-    if $stack9 == $stack8 goto label2;
-    $stack12 = virtualinvoke buf.<java.lang.StringBuilder: java.lang.StringBuilder append(char)>(45);
-    $stack13 = this.<org.apache.commons.lang3.CharRange: char end>;
-    $stack14 = virtualinvoke buf.<java.lang.StringBuilder: java.lang.StringBuilder append(char)>($stack13);
-
-  label2:
-    $stack16 = this;
-    $stack15 = buf;
-    $stack10 = virtualinvoke $stack15.<java.lang.StringBuilder: java.lang.String toString()>();
-    this.<org.apache.commons.lang3.CharRange: java.lang.String iToString> = $stack10;
-
-  label3:
-    $stack11 = this;
-    $stack3 = this.<org.apache.commons.lang3.CharRange: java.lang.String iToString>;
-
-    return $stack3;
-}
-","false","PUBLIC","Override","<p>Gets a string representation of the character range.</p>
-@return string representation of this range","implements java.io.Serializable, java.lang.Iterable","PRIVATE TRANSIENT java.lang.String iToString; PRIVATE FINAL char start; PRIVATE FINAL boolean negated; PRIVATE FINAL char end; PRIVATE STATIC FINAL long serialVersionUID","0","3","org.apache.commons.lang3.CharRange.isNegated(), java.lang.StringBuilder.append(char), java.lang.StringBuilder.toString()","'^', '-', 4","private"
+","false","PUBLIC FINAL","Override","Implementation of translate that maps onto the abstract translate(int, Writer) method. 
+{@inheritDoc}","org.apache.commons.lang3.text.translate.CharSequenceTranslator","","0","1","java.lang.Character.codePointAt(java.lang.CharSequence, int), org.apache.commons.lang3.text.translate.CodePointTranslator.translate(int, java.io.Writer)","1, 0","public",""
